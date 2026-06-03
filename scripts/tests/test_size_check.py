@@ -119,5 +119,39 @@ class SizeCheckTestCase(unittest.TestCase):
         self.assertEqual(rc, 2)
 
 
+class TestCodexScopes(unittest.TestCase):
+    def setUp(self):
+        self.root = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def _write(self, rel, content):
+        path = os.path.join(self.root, rel)
+        os.makedirs(os.path.dirname(path) or self.root, exist_ok=True)
+        with open(path, "w") as fh:
+            fh.write(content)
+
+    def test_override_excluded_by_default(self):
+        self._write("AGENTS.md", "base\n")
+        self._write("AGENTS.override.md", "override layer\n")
+        res = size_check.check(self.root)
+        joined = " ".join(res["chain_files"])
+        self.assertNotIn("AGENTS.override.md", joined)
+
+    def test_override_included_with_flag(self):
+        self._write("AGENTS.md", "base\n")
+        self._write("AGENTS.override.md", "override layer\n")
+        res = size_check.check(self.root, with_overrides=True)
+        joined = " ".join(res["chain_files"])
+        self.assertIn("AGENTS.override.md", joined)
+        self.assertGreater(res["chain_bytes"], len("base\n"))
+
+    def test_main_with_overrides_flag_runs(self):
+        self._write("AGENTS.md", "base\n")
+        self._write("AGENTS.override.md", "x\n")
+        self.assertEqual(size_check.main(["--root", self.root, "--with-overrides"]), 0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

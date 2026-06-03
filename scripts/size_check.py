@@ -9,6 +9,13 @@ files and SILENTLY TRUNCATES any content past the cap.
 This script reproduces that chain (root approximated by --root, no git discovery),
 sums it in BYTES, and warns BEFORE the cap so the truncation never bites.
 
+Optional Codex scope layers (OFF by default; the default root->cwd AGENTS.md chain
+behavior is unchanged):
+    --with-overrides  also include each chain directory's AGENTS.override.md
+                      precedence layer (appended right after that dir's AGENTS.md).
+    --global          also prepend the global ~/.codex/AGENTS.md to the top of the
+                      chain when it exists and is non-empty.
+
 Exit codes:
     0  chain under cap (may print a WARNING line if near cap)
     1  chain >= cap (over_cap)
@@ -24,6 +31,8 @@ DEFAULT_CAP = 32768
 DEFAULT_WARN_RATIO = 0.9
 JOIN_SEP = "\n\n"
 DOC_NAME = "AGENTS.md"
+OVERRIDE_NAME = "AGENTS.override.md"
+GLOBAL_DIR = os.path.expanduser("~/.codex")
 
 
 def _read_text(path):
@@ -56,28 +65,52 @@ def _chain_dirs(root, cwd):
     return dirs
 
 
-def chain_files(root, cwd=None):
+def _is_nonempty_doc(path):
+    """True if path is a readable file with non-empty UTF-8 content.
+
+    Mirrors the Codex empty-file skipping logic: a file that cannot be read or
+    has zero bytes is treated as absent.
+    """
+    if not os.path.isfile(path):
+        return False
+    text = _read_text(path)
+    if text is None:
+        return False
+    # Codex skips empty files. Treat a file with no bytes as empty.
+    return len(text.encode("utf-8")) != 0
+
+
+def chain_files(root, cwd=None, with_overrides=False, include_global=False):
     """Return ordered list of existing, NON-EMPTY AGENTS.md paths in the chain.
 
     Order is root first, deepest last. Empty files (0 bytes / no non-empty
     content) are skipped to match Codex behavior.
+
+    Optional Codex scope layers (OFF by default; default chain is unchanged):
+        include_global   when set, PREPEND the global ~/.codex/AGENTS.md to the
+                         top of the chain if it exists and is non-empty.
+        with_overrides   when set, for each chain directory append that dir's
+                         AGENTS.override.md (right after its AGENTS.md) if it
+                         exists and is non-empty.
     """
     result = []
+    if include_global:
+        global_path = os.path.join(GLOBAL_DIR, DOC_NAME)
+        if _is_nonempty_doc(global_path):
+            result.append(global_path)
     for directory in _chain_dirs(root, cwd):
         path = os.path.join(directory, DOC_NAME)
-        if not os.path.isfile(path):
-            continue
-        text = _read_text(path)
-        if text is None:
-            continue
-        # Codex skips empty files. Treat a file with no bytes as empty.
-        if len(text.encode("utf-8")) == 0:
-            continue
-        result.append(path)
+        if _is_nonempty_doc(path):
+            result.append(path)
+        if with_overrides:
+            override_path = os.path.join(directory, OVERRIDE_NAME)
+            if _is_nonempty_doc(override_path):
+                result.append(override_path)
     return result
 
 
-def check(root, cwd=None, cap=DEFAULT_CAP, warn_ratio=DEFAULT_WARN_RATIO):
+def check(root, cwd=None, cap=DEFAULT_CAP, warn_ratio=DEFAULT_WARN_RATIO,
+          with_overrides=False, include_global=False):
     """Sum the AGENTS.md chain in BYTES and report cap status.
 
     Returns a dict with keys:
@@ -87,8 +120,11 @@ def check(root, cwd=None, cap=DEFAULT_CAP, warn_ratio=DEFAULT_WARN_RATIO):
         over_cap: bool           chain_bytes >= cap
         near_cap: bool           cap*warn_ratio <= chain_bytes < cap
         files: list[{path, bytes}]
+
+    with_overrides / include_global enable the optional Codex scope layers (see
+    chain_files); both default OFF so the default chain behavior is unchanged.
     """
-    files = chain_files(root, cwd)
+    files = chain_files(root, cwd, with_overrides=with_overrides, include_global=include_global)
     contents = []
     per_file = []
     for path in files:
@@ -130,6 +166,17 @@ def _build_parser():
         help="warn when chain_bytes >= cap*ratio. Default: %s." % DEFAULT_WARN_RATIO,
     )
     parser.add_argument("--json", action="store_true", help="emit JSON instead of a human summary.")
+    parser.add_argument(
+        "--with-overrides",
+        action="store_true",
+        help="also include each chain dir's AGENTS.override.md precedence layer (off by default).",
+    )
+    parser.add_argument(
+        "--global",
+        dest="include_global",
+        action="store_true",
+        help="also prepend the global ~/.codex/AGENTS.md to the chain (off by default).",
+    )
     return parser
 
 
@@ -169,7 +216,14 @@ def main(argv=None):
         return 2
 
     try:
-        result = check(root, cwd=args.cwd, cap=args.cap, warn_ratio=args.warn_ratio)
+        result = check(
+            root,
+            cwd=args.cwd,
+            cap=args.cap,
+            warn_ratio=args.warn_ratio,
+            with_overrides=args.with_overrides,
+            include_global=args.include_global,
+        )
     except ValueError as exc:
         sys.stderr.write("error: %s\n" % exc)
         return 2
