@@ -180,5 +180,14 @@ class TestHtmlComments(Base):
         self.assertEqual(score_docs.score_doc(text)["dimensions"]["boundaries"]["score"], 0.0)
 
 
+class TestDriftRobustness(Base):
+    def test_root_without_doc_path_does_not_crash(self):
+        # drift needs BOTH a root and a doc_path on disk; root alone must not
+        # crash (find_drift would open(None)). It should just be not-applicable.
+        res = score_docs.score_doc("# x\n\n- a `b.ts` claim here\n", root=self.root)
+        self.assertFalse(res["dimensions"]["drift"]["applicable"])
+        self.assertIsInstance(res["score"], int)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

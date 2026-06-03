@@ -67,9 +67,17 @@ CONFLICTS = [
     },
 ]
 
-# Negation / prohibition context. A line matching this is treated as showing the
-# forbidden thing, not prescribing it -- so an "instance" hit on such a line is
-# skipped (low false-positive).
+# A 🚫/❌ counter-example marker. A line bearing one shows the FORBIDDEN option,
+# so it must never count as a directive -- for ANY side. This is the plugin's own
+# teaching style (✅ good / 🚫 bad), e.g. "✅ Use tabs / 🚫 Use spaces" is ONE
+# rule with its counter-example, not a contradiction. (⚠️ is deliberately absent:
+# it means "ask first", a real tier, not a prohibition of the adjacent token.)
+_COUNTEREXAMPLE_EMOJI_RE = re.compile(r"🚫|❌")
+
+# Broader negation / prohibition context (words + emoji). Applied ONLY to an
+# "instance" side (a literal occurrence like ``export default``), so a default
+# export mentioned in negative prose ("avoid export default", "instead of …") is
+# not mistaken for an endorsement.
 _NEG_RE = re.compile(
     r"🚫|❌|⚠️|"
     r"\bnot\b|\bnever\b|\bavoid\b|\bdon'?t\b|\bdo not\b|\binstead\b|"
@@ -81,11 +89,16 @@ _NEG_RE = re.compile(
 def _first_hit(lines, regex, kind):
     """Return (lineno, matchtext) for the first matching line, or None.
 
-    ``lines`` is iterated 1-based. For ``kind == "instance"`` any line that
-    ``_NEG_RE`` matches is skipped, so a forbidden example (shown as the thing
-    NOT to do) is not treated as a directive.
+    ``lines`` is iterated 1-based. A line carrying a 🚫/❌ counter-example marker
+    is skipped for EVERY side (it shows the forbidden option, not a directive).
+    For ``kind == "instance"`` the broader ``_NEG_RE`` (negation words) is also
+    applied, so a forbidden example in prose is not treated as a directive. A
+    genuine "always X / never X" contradiction without a 🚫/❌ marker is still
+    detected.
     """
     for lineno, line in enumerate(lines, start=1):
+        if _COUNTEREXAMPLE_EMOJI_RE.search(line):
+            continue
         if kind == "instance" and _NEG_RE.search(line):
             continue
         m = regex.search(line)

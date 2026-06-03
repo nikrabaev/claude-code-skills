@@ -98,6 +98,30 @@ class TestMain(Base):
             "--dir-b", self.b,
         ]), 2)
 
+    def test_index_file_loaded_not_passed_as_string(self):
+        # A valid --index must RESOLVE a documented `sym() in file` ref, not be
+        # passed through as a path string (which made every symbol "not in index"
+        # -> spurious drift -> depressed score). With-index score must be >= the
+        # no-index score, never below it.
+        idx = os.path.join(self.root, "index.json")
+        with open(idx, "w") as fh:
+            json.dump([{"symbol": "createStore", "kind": "function",
+                        "file": "src/store.ts"}], fh)
+
+        def score_a(extra):
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                eval_harness.main(["--root", self.root, "--json",
+                                   "--dir-a", self.a, "--dir-b", self.b] + extra)
+            return json.loads(buf.getvalue())["a"]["score"]
+
+        self.assertGreaterEqual(score_a(["--index", idx]), score_a([]))
+
+    def test_measure_skips_unreadable_doc(self):
+        missing = os.path.join(self.root, "does-not-exist.md")
+        m = eval_harness.measure(self.root, [missing])
+        self.assertEqual(m["count"], 0)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

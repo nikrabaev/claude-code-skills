@@ -220,7 +220,9 @@ def score_doc(
     if weights:
         merged.update(weights)
 
-    drift_applicable = root is not None
+    # drift needs BOTH a root and a doc on disk (find_drift opens doc_path);
+    # root alone is not enough -- otherwise it is excluded (weights renormalized).
+    drift_applicable = root is not None and doc_path is not None
 
     # "Rendered" dimensions ignore HTML comments (invisible to readers/agents).
     # size_fit (raw bytes -> Codex cap), ref_stability and drift (mirror the gate)

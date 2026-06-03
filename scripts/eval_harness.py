@@ -74,7 +74,10 @@ def measure(root, doc_paths, index=None):
     line_refs = 0
 
     for doc in doc_paths:
-        text = _read_text(doc)
+        try:
+            text = _read_text(doc)
+        except (IOError, OSError):
+            continue  # skip unreadable docs (TOCTOU / broken symlink), like the validators
         docs.append(os.path.relpath(doc, root))
 
         result = score_docs.score_doc(text, root=root, doc_path=doc, index=index)
@@ -203,8 +206,13 @@ def main(argv=None):
             sys.stderr.write("error: not a directory: %s\n" % d)
             return 2
 
-    measure_a = measure(args.root, _markdown_files(args.dir_a), index=args.index)
-    measure_b = measure(args.root, _markdown_files(args.dir_b), index=args.index)
+    # Load the symbol index FROM the file (score_docs._load_index returns None on
+    # any failure). Passing the raw path string would make every symbol resolve
+    # as "not in index" -> spurious drift -> a corrupted A-vs-B delta.
+    index = score_docs._load_index(args.index) if args.index else None
+
+    measure_a = measure(args.root, _markdown_files(args.dir_a), index=index)
+    measure_b = measure(args.root, _markdown_files(args.dir_b), index=index)
 
     out = {
         "a": {"label": args.label_a, **measure_a},

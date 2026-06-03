@@ -82,5 +82,29 @@ class TestMain(Base):
         self.assertEqual(conflict_scan.main(["--root", os.path.join(self.root, "no")]), 2)
 
 
+class TestCounterExampleEmoji(Base):
+    # The plugin's own ✅/🚫 style pairs a rule with its forbidden counter-example.
+    # A 🚫/❌ line shows the FORBIDDEN option, so it must not count as a directive
+    # for ANY side (not just the export-default "instance" case).
+    def test_tabs_rule_with_prohibited_spaces_no_conflict(self):
+        text = "✅ Use tabs for indentation.\n\U0001f6ab Use spaces for indentation.\n"
+        self.assertEqual(conflict_scan.find_conflicts(text), [])
+
+    def test_semicolons_rule_with_counterexample_no_conflict(self):
+        text = "✅ Always use semicolons.\n\U0001f6ab No semicolons.\n"
+        self.assertEqual(conflict_scan.find_conflicts(text), [])
+
+    def test_prefer_tabs_with_prohibited_spaces_no_conflict(self):
+        text = "Prefer tabs.\n\n\U0001f6ab use spaces\n"
+        self.assertEqual(conflict_scan.find_conflicts(text), [])
+
+    def test_genuine_semicolons_conflict_without_emoji_still_flagged(self):
+        # no counter-example emoji -> a real "always X / never X" contradiction
+        text = "Always use semicolons.\nNever use semicolons.\n"
+        self.assertIn(
+            "semicolons", [f["category"] for f in conflict_scan.find_conflicts(text)]
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
