@@ -16,7 +16,11 @@
 #
 # Order: validate_markdown -> no_line_refs -> path_exists -> symbol_exists ->
 #        check_links -> validate_mermaid -> dup_detect -> size_check
-# (score_docs is v3 and intentionally not part of this gate.)
+#
+# After the blocking steps, two ADVISORY steps run (score_docs, conflict_scan).
+# They REPORT only — their output is always printed but never changes the gate's
+# exit code (score_docs is a proxy, never the sole gate; conflict_scan is low-FP
+# but still advisory). The blocking set above is unchanged.
 #
 # Usage:   run_gate.sh [--root DIR] [--cwd SUBDIR] [doc-paths ...]
 #          --root   project root (default: .)
@@ -67,6 +71,17 @@ run_step() {
   fi
 }
 
+# run_advisory "Label" command [args...] — always prints its output; never
+# affects the pass/skip/fail counters. Advisory checks (score_docs, conflict_scan)
+# REPORT; they must never block the gate.
+run_advisory() {
+  local label="$1"; shift
+  local rc=0
+  "$@" >"$GATE_OUT" 2>&1 || rc=$?
+  printf '  \033[36mNOTE\033[0m  %s\n' "$label"
+  sed 's/^/        /' "$GATE_OUT"
+}
+
 echo "Documentation gate — root: $ROOT"
 echo
 
@@ -102,6 +117,13 @@ else
   run_step "AGENTS.md chain < 32 KiB (Codex cap)" \
     python3 "$HERE/size_check.py" --root "$ROOT"
 fi
+
+echo
+echo "Advisory (report-only — never blocks):"
+run_advisory "doc quality score (score_docs)" \
+  python3 "$HERE/score_docs.py" --root "$ROOT" "${PATHS[@]+${PATHS[@]}}"
+run_advisory "rule conflicts (conflict_scan)" \
+  python3 "$HERE/conflict_scan.py" --root "$ROOT" "${PATHS[@]+${PATHS[@]}}"
 
 echo
 echo "Gate summary: $passes passed, $skips skipped (tool/index absent), $errors failed."
