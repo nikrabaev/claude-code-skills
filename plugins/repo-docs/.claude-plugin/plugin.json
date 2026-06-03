@@ -2,6 +2,12 @@
   "name": "repo-docs",
   "version": "0.1.0",
   "description": "Generate, audit, compress, and validate AI-facing repository documentation (canonical AGENTS.md + thin CLAUDE.md importer) for Claude Code and OpenAI Codex, with stable references, source-of-truth discipline, and a validation gate sized for Codex's 32 KiB cap.",
+  "author": {
+    "name": "Nikita Rabaev",
+    "email": "nikrabaev@gmail.com"
+  },
+  "homepage": "https://github.com/nikrabaev/claude-code-skills/tree/main/plugins/repo-docs",
+  "repository": "https://github.com/nikrabaev/claude-code-skills",
   "keywords": [
     "documentation",
     "agents-md",
