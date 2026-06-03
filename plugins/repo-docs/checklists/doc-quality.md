@@ -8,7 +8,7 @@ do not claim "done" until the automated gate output is shown and clean.
 - [ ] Every claim traces to a file / symbol / command actually inspected — no guessing. [BP-9]
 - [ ] No line-number references anywhere. [AP-1]
 - [ ] No duplicated source-of-truth (no pasted `package.json`/config/schema). [BP-2]
-- [ ] AGENTS.md (whole root→cwd chain) under 32 KiB; each file within its tier budget. [BP-8 / AP-14]
+- [ ] CLAUDE.md (whole root→cwd chain) within its verbosity budget; each file within its tier budget. [BP-8]
 - [ ] Boundaries section present with all three tiers (✅ Always / ⚠️ Ask first / 🚫 Never). [BP-5]
 - [ ] Commands lead, with flags (including a single-test command). [BP-6]
 - [ ] Stack named with versions, not vaguely described. [BP-7]
@@ -16,9 +16,8 @@ do not claim "done" until the automated gate output is shown and clean.
 - [ ] Source-of-truth pointer + update triggers present (footer). [BP-10]
 - [ ] No volatile/temporary detail in an always-loaded file. [BP-11]
 - [ ] Mermaid (if any) validated, ≤ ~15–20 nodes, no `click`/interactive links. [BP-12 / AP-15]
-- [ ] CLAUDE.md imports `@AGENTS.md` and adds NO duplicated facts. [file strategy]
-- [ ] No `@`-imports in always-loaded files except CLAUDE.md's single `@AGENTS.md`. [AP-11]
-- [ ] Human-facing content not mixed into agent files (README ≠ AGENTS.md). [BP-4]
+- [ ] No heavy `@`-imports of large reference files in always-loaded files. [AP-11]
+- [ ] Human-facing content not mixed into agent files (README ≠ CLAUDE.md). [BP-4]
 - [ ] Unknowns marked `> [!WARNING] NEEDS VERIFICATION`, not invented. [BP-9]
 
 ## Automated gate
@@ -33,10 +32,10 @@ Run: `bash ${CLAUDE_PLUGIN_ROOT}/scripts/run_gate.sh --root .`
 | Symbol exists | `symbol_exists.py` (+ `extract_symbols.sh`) | `` `symbol()` in `file` `` reference with no definition |
 | Mermaid valid | `validate_mermaid.sh` → maid | syntax error in flowchart/sequence/pie/class/state |
 | SoT duplication | `dup_detect.py` | doc block that copied `package.json`/config |
-| Size budget | `size_check.py` | over a tier target, or **over the Codex 32 KiB chain cap** |
+| Size budget | `size_check.py` | over a tier target, or **over the CLAUDE.md verbosity budget** |
 
 **Policy:** errors (line refs, dead paths/symbols, broken links, invalid Mermaid,
-duplicated source-of-truth, over 32 KiB) **block**. SKIP means the external tool
-isn't installed — note it, don't score it. Warnings (near-cap, weak evidence)
+duplicated source-of-truth, over budget) **block**. SKIP means the external tool
+isn't installed — note it, don't score it. Warnings (near budget, weak evidence)
 report. Auto-repair only where safe (`maid --fix`, line-ref rewrite); otherwise
 surface. **No "done" claim until the gate output is shown.**

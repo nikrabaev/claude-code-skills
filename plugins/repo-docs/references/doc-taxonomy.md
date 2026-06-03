@@ -1,31 +1,24 @@
 # Documentation taxonomy
 
 For each doc type: purpose · audience · allowed · forbidden · length · update
-triggers · source-of-truth. Lengths are reasoned targets ([SYNTHESIS]) unless a
-vendor number is cited. The plugin has generators for `AGENTS.md`/`CLAUDE.md` (the
-first two), architecture, onboarding, ADRs, and the AI operating manual; request-flow
-and domain-model are documented as part of the architecture overview.
+triggers · source-of-truth. Lengths are reasoned targets ([SYNTHESIS]). The plugin
+has generators for `CLAUDE.md` (the first), architecture, onboarding, ADRs, and the
+AI operating manual; request-flow and domain-model are documented as part of the
+architecture overview.
 
-## AGENTS.md (canonical — Codex + interop)
+## CLAUDE.md (canonical agent instructions)
 
 - **Purpose:** the small set of facts any agent needs on *every* task here.
-  **Audience:** Codex (direct), Claude (via import), ~10 other tools.
+  **Audience:** Claude Code (always-loaded project memory).
 - **Allowed:** the six high-signal sections — commands+flags, testing, structure,
   code-style *examples*, git workflow, **✅/⚠️/🚫 boundaries** — plus pointers to
   deep docs. **Forbidden:** architecture essays, volatile state, duplicated
-  `package.json`/config, line numbers.
-- **Length:** ≤ ~1–2 pages; the whole root→cwd chain **< 32 KiB** (hard Codex cap).
-  **Triggers:** command/stack/version change, new guardrail, structural move.
+  `package.json`/config, line numbers, large `@`-imports.
+- **Length:** ≤ ~1–2 pages; the whole root→cwd chain within the verbosity budget
+  (soft ~32 KiB). **Triggers:** command/stack/version change, new guardrail,
+  structural move, new skill/command.
 - **Source of truth:** reference, never copy; nested per-package files for monorepos
-  (nearest wins).
-
-## CLAUDE.md (thin importer)
-
-- **Purpose:** give Claude Code the same always-on context + Claude-only pointers.
-  **Audience:** Claude Code only (Codex ignores it).
-- **Allowed:** `@AGENTS.md` import; a short "Claude Code specifics" block.
-  **Forbidden:** any fact that duplicates `AGENTS.md`; large `@`-imports.
-- **Length:** tiny (≤ ~15 lines + the import). **Triggers:** new skill/command.
+  (Claude Code merges the nearest).
 
 ## Architecture overview (`docs/architecture.md`)
 
@@ -81,5 +74,5 @@ indexes — it is an *index* of pointers.
 
 ## Separation principle
 
-README is for **humans** (quickstart); `AGENTS.md` is the **agent's** operating
+README is for **humans** (quickstart); `CLAUDE.md` is the **agent's** operating
 context. Don't mix audiences — it bloats both (anti-pattern AP-13).

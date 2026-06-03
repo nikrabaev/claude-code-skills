@@ -1,21 +1,22 @@
 # Verbosity & compression budgets
 
-Condensed from DESIGN §11. Two things bound how much you write: a **hard cap** you
-must never exceed, and **authoring targets** that keep always-loaded context cheap.
+Condensed from DESIGN §11. Two things bound how much you write: a **soft budget**
+for the always-loaded file, and **authoring targets** that keep always-loaded
+context cheap.
 
-## Hard ceiling (non-negotiable)
+## Soft budget for the always-loaded file
 
-- **Codex: 32 KiB** on the concatenated root→cwd `AGENTS.md` chain
-  (`project_doc_max_bytes`, default 32768). Codex **skips empty files, stops at the
-  limit, and silently truncates** anything past it. `size_check.py` sums the chain
-  and warns before the cap. This is the single cap you cannot cross.
+- **CLAUDE.md: stay well under ~32 KiB** for the root→cwd chain Claude Code loads
+  on every task. `size_check.py` sums the chain and warns as it approaches the
+  budget. This is a soft target, not a hard cap — an oversized always-loaded file
+  spends context budget and invites context rot, so trim rather than fill it.
 
 ## Authoring targets (Superpowers) — strong targets, not gates
 
 - Always-loaded text (orchestrator body, getting-started): **< 150–200 words**.
 - On-demand skills: **< 500 words**.
 - Split reference material **> ~100 lines** into a separate file.
-- `AGENTS.md`: aim **≤ ~1–2 pages**, comfortably under 32 KiB.
+- `CLAUDE.md`: aim **≤ ~1–2 pages**, comfortably within the budget.
 - The "hard 500-line SKILL.md" rule is **refuted** — it is a target, not a gate.
 
 ## Links vs duplication
@@ -43,6 +44,6 @@ A good line is one the agent **cannot already infer** and **can act on / verify*
 
 ## Summary/detail layering
 
-Every domain gets a one-line summary in `AGENTS.md` (or the operating-manual index)
+Every domain gets a one-line summary in `CLAUDE.md` (or the operating-manual index)
 and a detail doc loaded on demand. The summary *is* the routing description — the
 same metadata→body pattern as skills.

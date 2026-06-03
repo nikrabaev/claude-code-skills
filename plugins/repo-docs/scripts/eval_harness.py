@@ -39,7 +39,7 @@ import path_exists
 import no_line_refs
 import dup_detect
 
-SIZE_CAP = 32768  # 32 KiB -- the Codex AGENTS.md concatenation cap.
+SIZE_CAP = 32768  # 32 KiB -- the soft CLAUDE.md verbosity budget.
 
 # Numeric metrics that ``compare`` diffs (delta = a - b).
 COMPARE_METRICS = (
@@ -152,7 +152,7 @@ def _format_table(out):
         ("score (0-100)", a["score"], b["score"], delta["score"]["delta"]),
         ("total_bytes", a["total_bytes"], b["total_bytes"],
          delta["total_bytes"]["delta"]),
-        ("under cap (<32KiB)", a["under_cap"], b["under_cap"], None),
+        ("under budget (<32KiB)", a["under_cap"], b["under_cap"], None),
         ("evidence_density", a["evidence_density"], b["evidence_density"],
          delta["evidence_density"]["delta"]),
         ("path refs total", a["path_refs_total"], b["path_refs_total"], None),

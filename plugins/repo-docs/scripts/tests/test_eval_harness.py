@@ -43,7 +43,7 @@ class Base(unittest.TestCase):
         write(self.root, "package.json", '{"name":"proj"}\n')
         self.a = os.path.join(self.root, "good")
         self.b = os.path.join(self.root, "base")
-        write(self.a, "AGENTS.md", STRONG)
+        write(self.a, "CLAUDE.md", STRONG)
         write(self.b, "CLAUDE.md", WEAK)
 
     def tearDown(self):
@@ -52,12 +52,12 @@ class Base(unittest.TestCase):
 
 class TestMeasure(Base):
     def test_strong_beats_weak_on_score(self):
-        ma = eval_harness.measure(self.root, [os.path.join(self.a, "AGENTS.md")])
+        ma = eval_harness.measure(self.root, [os.path.join(self.a, "CLAUDE.md")])
         mb = eval_harness.measure(self.root, [os.path.join(self.b, "CLAUDE.md")])
         self.assertGreater(ma["score"], mb["score"])
 
     def test_strong_paths_resolve_better(self):
-        ma = eval_harness.measure(self.root, [os.path.join(self.a, "AGENTS.md")])
+        ma = eval_harness.measure(self.root, [os.path.join(self.a, "CLAUDE.md")])
         mb = eval_harness.measure(self.root, [os.path.join(self.b, "CLAUDE.md")])
         self.assertEqual(ma["path_resolve_pct"], 100.0)
         self.assertLess(mb["path_resolve_pct"], 100.0)
@@ -69,7 +69,7 @@ class TestMeasure(Base):
 
 class TestCompare(Base):
     def test_compare_delta_positive_for_better_a(self):
-        ma = eval_harness.measure(self.root, [os.path.join(self.a, "AGENTS.md")])
+        ma = eval_harness.measure(self.root, [os.path.join(self.a, "CLAUDE.md")])
         mb = eval_harness.measure(self.root, [os.path.join(self.b, "CLAUDE.md")])
         cmp = eval_harness.compare(ma, mb)
         self.assertGreater(cmp["score"]["delta"], 0)

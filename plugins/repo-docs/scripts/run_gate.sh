@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # run_gate.sh — the documentation validation gate (DESIGN.md §12), composed.
 #
-# Point this at a TARGET repo's generated AI docs (AGENTS.md/CLAUDE.md/docs). It
-# validates existence claims (paths, symbols, links) against that repo's real
-# source, so running it against this plugin's own teaching docs (references/,
-# examples/, checklists/) WILL report false "dead path" findings — those cite
-# illustrative paths on purpose. The gate is for generated docs, not meta-docs.
+# Point this at a TARGET repo's generated AI docs (CLAUDE.md/docs). It validates
+# existence claims (paths, symbols, links) against that repo's real source, so
+# running it against this plugin's own teaching docs (references/, examples/,
+# checklists/) WILL report false "dead path" findings — those cite illustrative
+# paths on purpose. The gate is for generated docs, not meta-docs.
 #
 # Runs every check in order. Each step is classified by its exit code:
 #   0      -> PASS
@@ -24,7 +24,7 @@
 #
 # Usage:   run_gate.sh [--root DIR] [--cwd SUBDIR] [doc-paths ...]
 #          --root   project root (default: .)
-#          --cwd    deepest AGENTS.md dir for the Codex chain (size_check)
+#          --cwd    deepest CLAUDE.md dir for the verbosity-budget chain (size_check)
 #          paths    explicit docs to lint/validate (default: the root tree)
 # Exit:    0 all blocking checks passed · 1 one or more blocking checks failed
 set -uo pipefail
@@ -111,10 +111,10 @@ run_step "no duplicated source-of-truth" \
   python3 "$HERE/dup_detect.py" --root "$ROOT" "${PATHS[@]+${PATHS[@]}}"
 
 if [ -n "$CWD" ]; then
-  run_step "AGENTS.md chain < 32 KiB (Codex cap)" \
+  run_step "CLAUDE.md within verbosity budget" \
     python3 "$HERE/size_check.py" --root "$ROOT" --cwd "$CWD"
 else
-  run_step "AGENTS.md chain < 32 KiB (Codex cap)" \
+  run_step "CLAUDE.md within verbosity budget" \
     python3 "$HERE/size_check.py" --root "$ROOT"
 fi
 

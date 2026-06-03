@@ -51,7 +51,7 @@ scripts). For each: replace the copy with a one-line reference to the owner
 - Already owned by a source-of-truth file → reference it; don't restate it.
 - Volatile implementation detail → omit; document the public contract instead.
 - Needed on every task and has no canonical home (a convention, a guardrail) →
-  put it in `AGENTS.md`.
+  put it in `CLAUDE.md`.
 - Deep/low-frequency → a `docs/` sub-doc with a pointer.
 
 ### 4. Verify

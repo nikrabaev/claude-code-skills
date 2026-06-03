@@ -20,7 +20,7 @@ detectable. This review **reports**; it does not auto-edit. Findings are **advis
 ### 1. Run the drift check
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/drift_check.py --root . docs/ AGENTS.md
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/drift_check.py --root . docs/ CLAUDE.md
 ```
 
 It surfaces three finding kinds:

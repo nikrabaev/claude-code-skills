@@ -21,10 +21,10 @@ thing that breaks it.
 ### 1. Enumerate what docs exist
 
 ```bash
-ls AGENTS.md CLAUDE.md docs/ adr/ docs/adr/ 2>/dev/null
+ls CLAUDE.md docs/ adr/ docs/adr/ 2>/dev/null
 ```
 
-Note which durable docs are present: `AGENTS.md` (always-on rules), architecture,
+Note which durable docs are present: `CLAUDE.md` (always-on rules), architecture,
 onboarding, ADRs, deployment/troubleshooting. Only index docs that actually exist.
 
 ### 2. Draft from the template
@@ -39,7 +39,7 @@ comment) into `docs/ai/OPERATING-MANUAL.md`. Fill:
 - **Working rules** — reference don't copy; stable refs; mark unknowns NEEDS
   VERIFICATION; run the gate.
 - **Update triggers** — when to add a row / where a fact actually belongs (e.g.
-  command changes go in `AGENTS.md`, not here).
+  command changes go in `CLAUDE.md`, not here).
 
 ### 3. Run the gate — no "done" until it passes
 
@@ -54,7 +54,7 @@ REQUIRED SUB-SKILL: superpowers:verification-before-completion.
 
 ## Common mistakes
 
-- Copying the boundaries or commands out of `AGENTS.md` into the manual → link to
-  `AGENTS.md` instead; it owns those facts.
+- Copying the boundaries or commands out of `CLAUDE.md` into the manual → link to
+  `CLAUDE.md` instead; it owns those facts.
 - Listing a doc that doesn't exist yet → only index what's there (or generate it
   first).

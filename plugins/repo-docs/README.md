@@ -2,9 +2,8 @@
 
 A Claude Code plugin for **AI-facing repository documentation**. It generates,
 audits, compresses, and validates the docs coding agents actually read — a canonical
-`AGENTS.md` (read by OpenAI Codex and ~25 other tools) plus a thin `CLAUDE.md` that
-`@`-imports it — keeping one source of truth, stable references (never line numbers),
-and the whole `AGENTS.md` chain under Codex's hard 32 KiB cap.
+`CLAUDE.md` — keeping one source of truth, stable references (never line numbers),
+and the always-loaded file within a soft verbosity budget.
 
 Part of the [`claude-code-skills`](../../) marketplace.
 
@@ -20,7 +19,7 @@ Part of the [`claude-code-skills`](../../) marketplace.
 | Command | Does |
 |---|---|
 | `/docs-audit` | Score and prioritize findings on existing AI docs (read-only). |
-| `/docs-generate` | Generate `AGENTS.md`/`CLAUDE.md` or a durable doc, evidence-gated. |
+| `/docs-generate` | Generate `CLAUDE.md` or a durable doc, evidence-gated. |
 | `/docs-validate` | Run the validation gate over a repo's docs. |
 | `/docs-fix` | Repair findings (line refs, broken Mermaid, duplication, …). |
 | `/docs-score` | Print the 0–100 quality score for a doc. |
@@ -38,12 +37,12 @@ One orchestrator (`repo-docs`) routes each request to a focused sub-skill:
 
 - **`scripts/`** — the validation gate (`run_gate.sh`) and its checks: markdown lint,
   no-line-refs, path/symbol existence, link checking, Mermaid validation (`maid`),
-  source-of-truth duplication, size/Codex-cap budget, drift, and scoring. Each has a
+  source-of-truth duplication, the verbosity budget, drift, and scoring. Each has a
   test under `scripts/tests/`.
-- **`templates/`** — `AGENTS.md`, `CLAUDE.md`, architecture, onboarding, ADR, and
+- **`templates/`** — `CLAUDE.md`, architecture, onboarding, ADR, and
   operating-manual scaffolds.
 - **`references/`** — the doc taxonomy, stable-reference strategy, Mermaid rules,
-  verbosity budgets, Codex/AGENTS.md semantics, and evidence levels.
+  verbosity budgets, and evidence levels.
 - **`checklists/`** — pre-generation, doc-quality, Mermaid, and pre-commit gates.
 - **`examples/`** — annotated good/bad docs.
 - **`docs/`** — the plugin's design blueprint (`DESIGN.md`) and implementation plans.

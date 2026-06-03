@@ -9,7 +9,7 @@ not block. The blocking gate (`run_gate.sh`) decides pass/fail; the score guides
 
 | Dimension | Weight | Measures | 1.0 means |
 |---|---|---|---|
-| `size_fit` | 0.15 | bytes vs the budget (target 12 KiB → Codex 32 KiB cap) | at/under the 12 KiB target |
+| `size_fit` | 0.15 | bytes vs the budget (target 12 KiB → 32 KiB soft budget) | at/under the 12 KiB target |
 | `evidence` | 0.30 | fraction of substantive lines bearing a backticked ref or `NEEDS VERIFICATION` | every claim is evidence-gated |
 | `ref_stability` | 0.15 | absence of line-number references | no `path.ext:NNN` / `line NNN` |
 | `examples` | 0.15 | presence of ✅/🚫 examples, fenced snippets, "e.g." | concrete examples throughout |
@@ -22,16 +22,16 @@ an unmeasurable dimension is dropped, never scored 0.
 
 HTML comments (`<!-- … -->`) are invisible to any reader/agent, so the "rendered"
 dimensions (`evidence`, `examples`, `boundaries`) score the comment-stripped text;
-`size_fit` (Codex loads the raw bytes), `ref_stability`, and `drift` use the raw
-text to mirror the gate's exact checks.
+`size_fit` (raw bytes), `ref_stability`, and `drift` use the raw text to mirror the
+gate's exact checks.
 
 ## Threshold & calibration
 
 - Default threshold: **70** (`--threshold N`). The v3 quality bar is "every
   generated doc scores above threshold."
 - The weights are **`[SYNTHESIS]` — reasoned, not vendor-blessed.** They are
-  calibrated so the annotated good example (`examples/good/menv-AGENTS.md`) scores
-  high (≈88) and the annotated bad example (`examples/bad/AGENTS.md`) scores low
+  calibrated so the annotated good example (`examples/good/menv-CLAUDE.md`) scores
+  high (≈88) and the annotated bad example (`examples/bad/CLAUDE.md`) scores low
   (≈40). Tune them for your repo with `--weights "evidence=0.4,size_fit=0.1,..."`.
 
 ## Use

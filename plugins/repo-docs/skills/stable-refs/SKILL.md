@@ -21,7 +21,7 @@ Outdated code-element references are an empirically widespread doc problem.
 3. **Route / API** — `POST /api/v1/orders`
 4. **DB table / entity** — `` `orders` table ``, `Order` entity
 5. **Event / topic / queue** — `orders.created`, `payments` queue
-6. **Config key (NAME, never value)** — `MENV_PASSPHRASE`, `project_doc_max_bytes`
+6. **Config key (NAME, never value)** — `MENV_PASSPHRASE`, `max_connections`
 7. **Test name** — test `"refunds on dispute"`
 8. **Command / script** — `bun test`, `npm run build`
 9. **File path only** — `src/index.ts` (when the whole file is the unit)

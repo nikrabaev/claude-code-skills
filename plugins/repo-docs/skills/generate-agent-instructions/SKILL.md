@@ -1,15 +1,14 @@
 ---
 name: generate-agent-instructions
 description: >
-  Generate the canonical AGENTS.md (six high-signal sections — commands first,
+  Generate the canonical CLAUDE.md (six high-signal sections — commands first,
   structure, code style with ✅/🚫 examples, testing, git workflow, ✅/⚠️/🚫
-  boundaries — plus a source-of-truth pointer and update triggers, kept under
-  Codex's 32 KiB cap) and a thin CLAUDE.md that imports it. Use when asked to
-  create, set up, or improve Claude Code or Codex project instructions
-  (AGENTS.md / CLAUDE.md) for a repository.
+  boundaries — plus a source-of-truth pointer and update triggers, kept within a
+  soft verbosity budget). Use when asked to create, set up, or improve Claude Code
+  project instructions (CLAUDE.md) for a repository.
 ---
 
-# Generate AGENTS.md (canonical) + CLAUDE.md (importer)
+# Generate CLAUDE.md (canonical agent instructions)
 
 **Core principle:** evidence-gated and progressive. Inspect the repo first, write
 only what you verified, keep the always-loaded file tiny, route depth elsewhere.
@@ -29,9 +28,9 @@ Read the top-level entry points and one or two representative source files to
 confirm the stack. Anything you cannot verify becomes a
 `> [!WARNING] NEEDS VERIFICATION` line — never an invented fact.
 
-### 2. Draft AGENTS.md from the template
+### 2. Draft CLAUDE.md from the template
 
-Copy `${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.md.tmpl` and fill it from the scan.
+Copy `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md.tmpl` and fill it from the scan.
 Honor every rule:
 
 - **Commands first**, with flags (single-test command too) — agents waste turns
@@ -48,37 +47,32 @@ Honor every rule:
 - **Footer**: `Source of truth: <dirs>. Update when: <triggers>.`
 - **No volatile detail** ("mid-migration", "for now", dated TODOs) in this
   always-loaded file.
-- Keep it to ~1–2 pages — comfortably under 32 KiB. Markdown must be lint-clean
+- Keep it to ~1–2 pages — within the verbosity budget. Markdown must be lint-clean
   (blank lines around headings; every fenced block has a language).
+- **Deep docs as pointers** — link `docs/architecture.md`, `docs/onboarding.md`,
+  and any repo-specific skills/`/commands`; never paste their content.
 
-For a monorepo, put repo-wide rules in the root `AGENTS.md` and package-specific
-overrides in nested `packages/<x>/AGENTS.md` (Codex: nearest wins). The whole
-root→cwd chain must stay under the cap.
+For a monorepo, put repo-wide rules in the root `CLAUDE.md` and package-specific
+overrides in nested `packages/<x>/CLAUDE.md` (Claude Code merges the nearest).
+Keep the whole chain within the verbosity budget.
 
-### 3. Write CLAUDE.md (thin importer)
-
-Copy `${CLAUDE_PLUGIN_ROOT}/templates/CLAUDE.md.tmpl` verbatim-ish: its only
-substance is `@AGENTS.md` plus a short "Claude Code specifics" block (which
-skills/commands/deep docs exist). Put NO fact in CLAUDE.md that belongs in
-AGENTS.md — zero duplication, no cross-file drift.
-
-### 4. Run the gate — no "done" until it passes
+### 3. Run the gate — no "done" until it passes
 
 ```bash
 bash ${CLAUDE_PLUGIN_ROOT}/scripts/run_gate.sh --root .
 ```
 
 It runs: markdown lint → no line refs → paths exist → symbols exist → links →
-Mermaid → no duplicated source-of-truth → **AGENTS.md chain < 32 KiB**. Fix every
-FAIL (SKIP just means a tool isn't installed). Then show the gate output and both
-files. Work through `${CLAUDE_PLUGIN_ROOT}/checklists/doc-quality.md`.
+Mermaid → no duplicated source-of-truth → **CLAUDE.md within verbosity budget**. Fix
+every FAIL (SKIP just means a tool isn't installed). Then show the gate output and
+the file. Work through `${CLAUDE_PLUGIN_ROOT}/checklists/doc-quality.md`.
 
 REQUIRED SUB-SKILL: superpowers:verification-before-completion.
 
 ## Common mistakes
 
 - Pasting `package.json` scripts → `dup_detect` blocks. Reference them instead.
-- A 400-line AGENTS.md → context rot + risk of the Codex tail being dropped. Route
-  detail to `docs/` and leave one-line pointers.
+- A 400-line CLAUDE.md → context rot. Route detail to `docs/` and leave one-line
+  pointers.
 - Claiming an architecture you didn't read in the source → mark NEEDS VERIFICATION.
 - Line numbers (`foo.ts:NNN`) → `no_line_refs` blocks. Use path + symbol.

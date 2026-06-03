@@ -35,7 +35,7 @@ import drift_check
 
 DEFAULT_THRESHOLD = 70
 DEFAULT_SIZE_TARGET = 12288  # 12 KiB -- the size we aim for.
-DEFAULT_SIZE_CAP = 32768  # 32 KiB -- the Codex AGENTS.md concatenation cap.
+DEFAULT_SIZE_CAP = 32768  # 32 KiB -- the upper bound where size_fit hits 0.
 
 # [SYNTHESIS] -- reasoned, not vendor-blessed. Tune with --weights. Sum 1.0.
 DEFAULT_WEIGHTS = {
@@ -61,8 +61,8 @@ _DIMENSIONS = (
 # delete the template comment before shipping), so their contents must NOT count
 # toward the "rendered" dimensions (evidence, examples, boundaries). Otherwise an
 # annotation like "<!-- boundaries missing: ✅ ⚠️ 🚫 -->" would falsely earn full
-# boundary credit. (size_fit measures raw bytes -- Codex loads the whole file;
-# ref_stability and drift mirror the gate's exact checks -- so those use raw text.)
+# boundary credit. (size_fit measures raw bytes -- the whole file loads on every
+# task; ref_stability and drift mirror the gate's checks -- so those use raw text.)
 _HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 
 
@@ -225,7 +225,7 @@ def score_doc(
     drift_applicable = root is not None and doc_path is not None
 
     # "Rendered" dimensions ignore HTML comments (invisible to readers/agents).
-    # size_fit (raw bytes -> Codex cap), ref_stability and drift (mirror the gate)
+    # size_fit (raw bytes vs the budget), ref_stability and drift (mirror the gate)
     # operate on the raw text.
     visible = _strip_html_comments(text)
 

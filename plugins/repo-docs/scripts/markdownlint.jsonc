@@ -1,5 +1,5 @@
 {
-  // Relaxed markdownlint config for AI-facing docs (AGENTS.md / CLAUDE.md and the
+  // Relaxed markdownlint config for AI-facing docs (CLAUDE.md and the
   // generated doc set). Generated agent docs are dense and not prose-wrapped, so a
   // few stylistic rules are noise here. Everything STRUCTURAL stays on (heading
   // spacing, fenced-code languages, list/anchor/link defects), because those affect

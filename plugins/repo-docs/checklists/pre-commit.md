@@ -14,7 +14,7 @@ Before committing generated or edited docs, create a TodoWrite item for each box
 - [ ] No line-number references (`no_line_refs.py`). [AP-1]
 - [ ] Referenced paths/symbols resolve (`path_exists.py` / `symbol_exists.py`). [BP-3]
 - [ ] No duplicated source-of-truth (`dup_detect.py`). [BP-2]
-- [ ] `AGENTS.md` chain **< 32 KiB** (`size_check.py`). [AP-14]
+- [ ] `CLAUDE.md` chain **within its verbosity budget** (`size_check.py`). [BP-8]
 - [ ] Mermaid (if any) passed `maid`; no `click`/interactive links. [BP-12 / AP-15]
 
 ## Judgment

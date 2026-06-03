@@ -1,14 +1,62 @@
 <!--
-  CLAUDE.md — thin importer. Its ONLY substance is the @AGENTS.md import plus a
-  short Claude-Code-specific block. Put NO fact here that belongs in AGENTS.md
-  (that would duplicate and drift). Codex ignores this file; Claude Code reads it
-  and pulls in AGENTS.md via the import. Keep it tiny (≤ ~15 lines + the import).
-  Do NOT add heavy @-imports of reference files — @ force-loads context.
+  CLAUDE.md — canonical agent instructions. Claude Code reads this directly as
+  always-loaded project memory (and merges any nested package CLAUDE.md files).
+
+  Fill every <placeholder> from the repo scan. DELETE this comment and any
+  section that does not apply. RULES:
+    - Commands FIRST, with flags.                              (BP-6)
+    - Specific stack + versions, not vague descriptions.       (BP-7)
+    - Reference source-of-truth; never paste it.               (BP-2)
+    - Stable refs only (path+symbol/route/table/command/test). (BP-3)
+    - No line numbers, ever.                                    (AP-1)
+    - Keep it to ~1–2 pages — this file loads on every task.    (BP-11)
+    - No volatile/temporary detail in this always-loaded file.  (BP-11)
+    - Unknowns -> "> [!WARNING] NEEDS VERIFICATION", not guesses.(BP-9)
 -->
-@AGENTS.md
+# <Project> — agent guide
 
-## Claude Code specifics
+<One line: concrete stack + versions, e.g. "Bun runtime (not Node); Ink+React TUI; age-encrypted vault.">
 
-- Deep docs: architecture → `docs/architecture.md`; onboarding → `docs/onboarding.md`. <!-- adjust/remove to match what exists -->
-- Skills/commands: <list any repo-specific skills or `/commands`, or remove this line>.
-- Everything an agent needs on every task lives in AGENTS.md above.
+## Commands
+
+- Install: `<cmd>`
+- Test: `<cmd>` — single test: `<cmd path/to/one.test.ts>`
+- Build: `<cmd>`   ·   Lint/format: `<cmd>`
+- (Full list: see `package.json` scripts / `Makefile` — do not duplicate here.)
+
+## Project structure
+
+- `<src/...>` — <role>
+- `<dir/...>` — <role>
+- (Reference directories and their purpose; do not paste a full file tree.)
+
+## Code style
+
+- <rule> — ✅ `<good>`   🚫 `<bad>`
+- <rule> — ✅ `<good>`   🚫 `<bad>`
+- (Linter/formatter config is the source of truth: see `<config file>`.)
+
+## Testing
+
+- Framework: `<name>`. Run one test: `<cmd>`.
+- <convention: where tests live, naming, fixtures — referenced, not copied>.
+
+## Git / PR workflow
+
+- Branch: `<convention>`. Commits: `<convention>`.
+- <PR/checks expectations>.
+
+## Boundaries
+
+- ✅ **Always:** run tests before declaring done; <repo-specific>.
+- ⚠️ **Ask first:** schema migrations; dependency bumps; <repo-specific>.
+- 🚫 **Never:** commit secrets; reference line numbers; duplicate config/`package.json`; <repo-specific>.
+
+## Deep docs
+
+<!-- Pointers only — never duplicate. Remove any line that has no doc yet. -->
+- Architecture → `docs/architecture.md`; onboarding → `docs/onboarding.md`.
+- Repo-specific skills / `/commands`: <list, or remove this line>.
+
+---
+Source of truth: `<dirs/files>`. Update when: `<commands/stack/version change, new guardrail, structural move>`.

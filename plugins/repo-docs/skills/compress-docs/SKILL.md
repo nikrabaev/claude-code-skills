@@ -1,11 +1,10 @@
 ---
 name: compress-docs
 description: >
-  Compress an oversized or over-cap agent doc by routing detail to on-demand
-  sub-docs, cutting filler and duplication, and getting the AGENTS.md chain back
-  under Codex's 32 KiB cap — without losing any fact an agent needs on every task.
-  Use when a doc is bloated, fails the size check, or the user says it is too long
-  or over the cap.
+  Compress an oversized agent doc by routing detail to on-demand sub-docs, cutting
+  filler and duplication, and getting the CLAUDE.md chain back within its verbosity
+  budget — without losing any fact an agent needs on every task. Use when a doc is
+  bloated, fails the size check, or the user says it is too long or over budget.
 ---
 
 # Compress an over-budget agent doc
@@ -23,7 +22,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/size_check.py --root . --cwd <deepest-pkg-
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dup_detect.py --root .
 ```
 
-`size_check` gives the chain bytes vs the 32 KiB cap; `dup_detect` finds pasted
+`size_check` gives the chain bytes vs the verbosity budget; `dup_detect` finds pasted
 source-of-truth. Note both before touching anything.
 
 ### 2. Reduce, in this order
@@ -42,12 +41,12 @@ source-of-truth. Note both before touching anything.
 
 Preserve stable references and the ✅/⚠️/🚫 Boundaries while trimming.
 
-### 3. Verify under the cap
+### 3. Verify within budget
 
 ```bash
 bash ${CLAUDE_PLUGIN_ROOT}/scripts/run_gate.sh --root .
 ```
 
-`size_check` must report the chain under 32 KiB and `dup_detect` must be clean.
+`size_check` must report the chain within budget and `dup_detect` must be clean.
 Show the before/after byte counts and the gate output. No "done" until it passes —
 REQUIRED SUB-SKILL: superpowers:verification-before-completion.

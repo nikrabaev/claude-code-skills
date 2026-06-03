@@ -23,5 +23,5 @@ evidence-gated — inspect first, never guess. (BP-9)
 
 ## Budget
 
-- [ ] Picked the size target for this doc type; for `AGENTS.md`, the whole root→cwd
-      chain must stay **< 32 KiB** (`size_check.py`).
+- [ ] Picked the size target for this doc type; for `CLAUDE.md`, the whole root→cwd
+      chain must stay **within the verbosity budget** (`size_check.py`).

@@ -8,7 +8,7 @@ you can add them to Claude Code with a couple of commands.
 
 | Plugin | Description |
 |---|---|
-| [`repo-docs`](plugins/repo-docs) | Generate, audit, compress, and validate AI-facing repository documentation — the canonical `AGENTS.md` + a thin `CLAUDE.md` importer — for Claude Code and OpenAI Codex, with stable references, source-of-truth discipline, and a validation gate sized for Codex's 32 KiB cap. 14 skills, 6 slash commands. |
+| [`repo-docs`](plugins/repo-docs) | Generate, audit, compress, and validate AI-facing repository documentation — the canonical `CLAUDE.md` — for Claude Code, with stable references, source-of-truth discipline, and a validation gate with a soft verbosity budget. 14 skills, 6 slash commands. |
 
 ## Install
 

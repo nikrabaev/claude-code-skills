@@ -33,7 +33,7 @@ See the design notes in `docs/architecture-v2-DRAFT.md`.
 
 We are currently mid-migration to the v2 API; for now use the old client.
 <!-- [AP-9] volatile/temporary detail in an always-loaded file. Fix: omit from
-     durable docs, or keep as a dated note outside AGENTS.md. -->
+     durable docs, or keep as a dated note outside CLAUDE.md. -->
 
 <!-- [AP-2/AP-14] MISSING: no Boundaries section (✅/⚠️/🚫). The single
      highest-signal section is absent — "Never commit secrets" especially.

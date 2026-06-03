@@ -12,7 +12,7 @@ push to `main`) that touches docs. Drop it into the TARGET repo at
 | Markdown lint | `markdownlint-cli2` | heading/list/fence defects, in-doc anchors (MD051), link-defect rules | network, whether a path exists |
 | Mermaid validate | `@probelabs/maid` | syntax errors in flowchart/sequence/pie/class/state | other diagram types; `click`/CSP issues |
 | Link & path check | `lychee` (offline) | dead links, dead local file paths, bad fragments | external flakiness (run a nightly full check separately) |
-| AGENTS.md < 32 KiB | inline Python | the Codex hard cap (silent truncation past it) | token count (it measures bytes) |
+| CLAUDE.md within budget | inline Python | the soft verbosity budget (measured in bytes) | token count |
 
 The tools are wired to **what they actually do** (DESIGN §12): markdownlint never
 checks the network or path existence — `lychee` does; `maid` only deeply validates
@@ -28,7 +28,7 @@ failing the build:
 ```yaml
       - name: Docs drift (advisory)
         continue-on-error: true
-        run: python3 path/to/repo-docs/scripts/drift_check.py --root . docs/ AGENTS.md
+        run: python3 path/to/repo-docs/scripts/drift_check.py --root . docs/ CLAUDE.md
 ```
 
 Add `--strict` only if a team decides drift should block a merge.

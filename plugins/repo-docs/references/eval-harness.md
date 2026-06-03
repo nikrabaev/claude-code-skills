@@ -1,7 +1,7 @@
 # Empirical self-eval — does repo-docs beat baseline `/init`?
 
 The open question (DESIGN §16 closing): *does a repo with repo-docs-generated
-docs measurably improve Claude/Codex task success vs a baseline `/init`-style
+docs measurably improve Claude Code task success vs a baseline `/init`-style
 CLAUDE.md?* The drift literature proves bad docs are a real, measurable problem;
 no source yet measures the *uplift* of disciplined AI docs. Two tiers:
 
@@ -10,7 +10,7 @@ no source yet measures the *uplift* of disciplined AI docs. Two tiers:
 `scripts/eval_harness.py` measures two doc sets against a repo's real source and
 reports the delta on objective properties:
 
-- `score_docs` score, total bytes / Codex-cap fit, evidence density,
+- `score_docs` score, total bytes / budget fit, evidence density,
 - % of path references that resolve, line-ref count, duplication findings.
 
 ```bash

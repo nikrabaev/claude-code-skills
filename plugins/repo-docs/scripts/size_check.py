@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
-"""Validate the OpenAI Codex AGENTS.md chain against the project_doc_max_bytes cap.
+"""Validate the CLAUDE.md verbosity budget.
 
-Codex concatenates the AGENTS.md chain from the git root DOWN to the working
-directory, joins file contents with a single blank line ("\\n\\n"), and enforces
-a HARD byte cap (project_doc_max_bytes, default 32768 = 32 KiB). It SKIPS EMPTY
-files and SILENTLY TRUNCATES any content past the cap.
+CLAUDE.md is Claude Code's always-loaded project memory: it loads on every task,
+so a bloated file spends context budget and invites context rot. Claude Code
+merges the CLAUDE.md chain from the project root DOWN to the working directory,
+so this script reproduces that chain (root approximated by --root, no git
+discovery), sums it in BYTES, and warns before a soft budget so the always-loaded
+layer stays small.
 
-This script reproduces that chain (root approximated by --root, no git discovery),
-sums it in BYTES, and warns BEFORE the cap so the truncation never bites.
-
-Optional Codex scope layers (OFF by default; the default root->cwd AGENTS.md chain
-behavior is unchanged):
-    --with-overrides  also include each chain directory's AGENTS.override.md
-                      precedence layer (appended right after that dir's AGENTS.md).
-    --global          also prepend the global ~/.codex/AGENTS.md to the top of the
-                      chain when it exists and is non-empty.
+The budget is a soft, configurable target (--budget, default 32 KiB), not a hard
+cap; aim for ~1-2 pages per file rather than treating the budget as a ceiling to
+fill.
 
 Exit codes:
-    0  chain under cap (may print a WARNING line if near cap)
-    1  chain >= cap (over_cap)
+    0  chain under budget (may print a WARNING line if near it)
+    1  chain >= budget (over_budget)
     2  usage / internal error
 """
 
@@ -27,12 +23,10 @@ import json
 import os
 import sys
 
-DEFAULT_CAP = 32768
+DEFAULT_BUDGET = 32768
 DEFAULT_WARN_RATIO = 0.9
 JOIN_SEP = "\n\n"
-DOC_NAME = "AGENTS.md"
-OVERRIDE_NAME = "AGENTS.override.md"
-GLOBAL_DIR = os.path.expanduser("~/.codex")
+DOC_NAME = "CLAUDE.md"
 
 
 def _read_text(path):
@@ -68,63 +62,43 @@ def _chain_dirs(root, cwd):
 def _is_nonempty_doc(path):
     """True if path is a readable file with non-empty UTF-8 content.
 
-    Mirrors the Codex empty-file skipping logic: a file that cannot be read or
-    has zero bytes is treated as absent.
+    An empty or unreadable file contributes nothing to the always-loaded layer,
+    so it is treated as absent.
     """
     if not os.path.isfile(path):
         return False
     text = _read_text(path)
     if text is None:
         return False
-    # Codex skips empty files. Treat a file with no bytes as empty.
     return len(text.encode("utf-8")) != 0
 
 
-def chain_files(root, cwd=None, with_overrides=False, include_global=False):
-    """Return ordered list of existing, NON-EMPTY AGENTS.md paths in the chain.
+def chain_files(root, cwd=None):
+    """Return ordered list of existing, NON-EMPTY CLAUDE.md paths in the chain.
 
     Order is root first, deepest last. Empty files (0 bytes / no non-empty
-    content) are skipped to match Codex behavior.
-
-    Optional Codex scope layers (OFF by default; default chain is unchanged):
-        include_global   when set, PREPEND the global ~/.codex/AGENTS.md to the
-                         top of the chain if it exists and is non-empty.
-        with_overrides   when set, for each chain directory append that dir's
-                         AGENTS.override.md (right after its AGENTS.md) if it
-                         exists and is non-empty.
+    content) are skipped — they add nothing to the always-loaded context.
     """
     result = []
-    if include_global:
-        global_path = os.path.join(GLOBAL_DIR, DOC_NAME)
-        if _is_nonempty_doc(global_path):
-            result.append(global_path)
     for directory in _chain_dirs(root, cwd):
         path = os.path.join(directory, DOC_NAME)
         if _is_nonempty_doc(path):
             result.append(path)
-        if with_overrides:
-            override_path = os.path.join(directory, OVERRIDE_NAME)
-            if _is_nonempty_doc(override_path):
-                result.append(override_path)
     return result
 
 
-def check(root, cwd=None, cap=DEFAULT_CAP, warn_ratio=DEFAULT_WARN_RATIO,
-          with_overrides=False, include_global=False):
-    """Sum the AGENTS.md chain in BYTES and report cap status.
+def check(root, cwd=None, budget=DEFAULT_BUDGET, warn_ratio=DEFAULT_WARN_RATIO):
+    """Sum the CLAUDE.md chain in BYTES and report budget status.
 
     Returns a dict with keys:
         chain_files: list[str]   ordered chain paths (non-empty only)
         chain_bytes: int         len(joined.encode("utf-8"))
-        cap: int
-        over_cap: bool           chain_bytes >= cap
-        near_cap: bool           cap*warn_ratio <= chain_bytes < cap
+        budget: int
+        over_budget: bool        chain_bytes >= budget
+        near_budget: bool        budget*warn_ratio <= chain_bytes < budget
         files: list[{path, bytes}]
-
-    with_overrides / include_global enable the optional Codex scope layers (see
-    chain_files); both default OFF so the default chain behavior is unchanged.
     """
-    files = chain_files(root, cwd, with_overrides=with_overrides, include_global=include_global)
+    files = chain_files(root, cwd)
     contents = []
     per_file = []
     for path in files:
@@ -138,15 +112,15 @@ def check(root, cwd=None, cap=DEFAULT_CAP, warn_ratio=DEFAULT_WARN_RATIO,
     joined = JOIN_SEP.join(contents)
     chain_bytes = len(joined.encode("utf-8"))
 
-    over_cap = chain_bytes >= cap
-    near_cap = (cap * warn_ratio) <= chain_bytes < cap
+    over_budget = chain_bytes >= budget
+    near_budget = (budget * warn_ratio) <= chain_bytes < budget
 
     return {
         "chain_files": files,
         "chain_bytes": chain_bytes,
-        "cap": cap,
-        "over_cap": over_cap,
-        "near_cap": near_cap,
+        "budget": budget,
+        "over_budget": over_budget,
+        "near_budget": near_budget,
         "files": per_file,
     }
 
@@ -154,52 +128,41 @@ def check(root, cwd=None, cap=DEFAULT_CAP, warn_ratio=DEFAULT_WARN_RATIO,
 def _build_parser():
     parser = argparse.ArgumentParser(
         prog="size_check.py",
-        description="Validate the AGENTS.md chain against Codex's project_doc_max_bytes cap.",
+        description="Validate the CLAUDE.md chain against a soft verbosity budget.",
     )
-    parser.add_argument("--root", default=".", help="git/project root (chain top). Default: current dir.")
+    parser.add_argument("--root", default=".", help="project root (chain top). Default: current dir.")
     parser.add_argument("--cwd", default=None, help="working subdirectory relative to --root (chain bottom).")
-    parser.add_argument("--cap", type=int, default=DEFAULT_CAP, help="hard byte cap. Default: %d." % DEFAULT_CAP)
+    parser.add_argument("--budget", type=int, default=DEFAULT_BUDGET, help="soft byte budget. Default: %d." % DEFAULT_BUDGET)
     parser.add_argument(
         "--warn-ratio",
         type=float,
         default=DEFAULT_WARN_RATIO,
-        help="warn when chain_bytes >= cap*ratio. Default: %s." % DEFAULT_WARN_RATIO,
+        help="warn when chain_bytes >= budget*ratio. Default: %s." % DEFAULT_WARN_RATIO,
     )
     parser.add_argument("--json", action="store_true", help="emit JSON instead of a human summary.")
-    parser.add_argument(
-        "--with-overrides",
-        action="store_true",
-        help="also include each chain dir's AGENTS.override.md precedence layer (off by default).",
-    )
-    parser.add_argument(
-        "--global",
-        dest="include_global",
-        action="store_true",
-        help="also prepend the global ~/.codex/AGENTS.md to the chain (off by default).",
-    )
     return parser
 
 
 def _print_human(result):
-    cap = result["cap"]
+    budget = result["budget"]
     chain_bytes = result["chain_bytes"]
-    print("AGENTS.md chain: %d file(s), %d bytes (cap %d)" % (len(result["chain_files"]), chain_bytes, cap))
+    print("CLAUDE.md chain: %d file(s), %d bytes (budget %d)" % (len(result["chain_files"]), chain_bytes, budget))
     for entry in result["files"]:
         print("  %8d  %s" % (entry["bytes"], entry["path"]))
     if not result["files"]:
-        print("  (no non-empty AGENTS.md files found)")
-    if result["over_cap"]:
+        print("  (no non-empty CLAUDE.md files found)")
+    if result["over_budget"]:
         print(
-            "ERROR: chain is %d bytes, at or above the %d byte cap. Codex will SILENTLY TRUNCATE."
-            % (chain_bytes, cap)
+            "ERROR: chain is %d bytes, at or above the %d byte budget. Trim CLAUDE.md to keep the always-loaded layer small."
+            % (chain_bytes, budget)
         )
-    elif result["near_cap"]:
+    elif result["near_budget"]:
         print(
-            "WARNING: chain is %d bytes, within %.0f%% of the %d byte cap. Trim before it truncates."
-            % (chain_bytes, result.get("warn_ratio_pct", 90), cap)
+            "WARNING: chain is %d bytes, within %.0f%% of the %d byte budget. Trim before it grows further."
+            % (chain_bytes, result.get("warn_ratio_pct", 90), budget)
         )
     else:
-        print("OK: chain is under the cap.")
+        print("OK: chain is within budget.")
 
 
 def main(argv=None):
@@ -219,10 +182,8 @@ def main(argv=None):
         result = check(
             root,
             cwd=args.cwd,
-            cap=args.cap,
+            budget=args.budget,
             warn_ratio=args.warn_ratio,
-            with_overrides=args.with_overrides,
-            include_global=args.include_global,
         )
     except ValueError as exc:
         sys.stderr.write("error: %s\n" % exc)
@@ -238,7 +199,7 @@ def main(argv=None):
         result_for_print["warn_ratio_pct"] = args.warn_ratio * 100
         _print_human(result_for_print)
 
-    return 1 if result["over_cap"] else 0
+    return 1 if result["over_budget"] else 0
 
 
 if __name__ == "__main__":
