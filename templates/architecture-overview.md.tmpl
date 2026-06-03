@@ -1,0 +1,42 @@
+<!--
+  architecture-overview.md — durable mental model for agents + humans (DESIGN §8).
+  Fill every <placeholder> from the repo scan + extractors. DELETE this comment
+  and any section that does not apply. RULES:
+    - Evidence-gated: every component/flow traces to a real dir/symbol you saw. (BP-9)
+    - Stable refs only: module paths + exported symbols; NEVER line numbers.   (BP-3)
+    - Reference, don't copy source-of-truth (schema, config).                  (BP-2)
+    - AT MOST ONE Mermaid diagram, ≤ ~15–20 nodes, validated with `maid`,
+      no click/interactive links. Quote labels with ()[]{}:;,"#.               (BP-12)
+    - Unknowns -> "> [!WARNING] NEEDS VERIFICATION", never invented components. (BP-9)
+-->
+# <Project> — architecture overview
+
+<One paragraph: what the system does and its single most important boundary.>
+
+## Components
+
+- **<Component>** — `<src/dir/>` — <responsibility; public entry symbol e.g. `start()` in `src/x.ts`>.
+- **<Component>** — `<src/dir/>` — <responsibility>.
+- (One bullet per top-level component. Reference the directory + a public symbol.)
+
+## Data flow
+
+<Trace one representative path in prose: route -> handler symbol -> store/queue.
+ Keep it to the durable shape, not every branch.>
+
+```mermaid
+flowchart LR
+  client["Client"] --> api["API: <handlerSymbol>()"]
+  api --> store["<store/dir>"]
+```
+
+## Boundaries & contracts
+
+- <Public contract / interface> — owned by `<module>`.
+- <Invariant that must hold> — enforced in `<symbol>() in <file>`.
+
+> [!WARNING] NEEDS VERIFICATION
+> <Anything you could not confirm in the source — replace or delete before shipping.>
+
+---
+Source of truth: `<module dirs / interfaces>`. Update when: `<new top-level component, boundary change>`.

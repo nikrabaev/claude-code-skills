@@ -11,5 +11,10 @@
   "MD013": false,
   "MD033": false,
   "MD041": false,
+  // MD060 (table-column-style) flags compact `|---|---|` separators against padded
+  // header rows. Pipe spacing does NOT affect rendering, and the generated tables
+  // (onboarding troubleshooting, operating-manual index) use compact separators —
+  // so this is cosmetic noise, off like the other style rules above.
+  "MD060": false,
   "MD024": { "siblings_only": true }
 }

@@ -1,0 +1,39 @@
+<!--
+  OPERATING-MANUAL.md — how an agent should work in THIS repo (DESIGN §8). Path:
+  docs/ai/OPERATING-MANUAL.md. It is an INDEX of pointers: one line per doc with a
+  when-to-read hint. It MUST NOT duplicate the docs it indexes — if you are tempted
+  to copy a fact in here, link to the doc that owns it instead. DELETE this comment.
+-->
+# <Project> — AI operating manual
+
+How to work effectively in this repo as a coding agent. This page only points; the
+facts live in the linked docs.
+
+## Where to read what
+
+| When you need… | Read | Owns |
+|---|---|---|
+| The always-on rules (commands, boundaries) | `AGENTS.md` | every-task facts |
+| The system's shape | `docs/architecture.md` | components, data flow |
+| To get set up / make a first change | `docs/onboarding.md` | setup, repo tour |
+| Why a decision was made | `adr/` | decision records |
+
+## Safe inspection (read-only — run before writing)
+
+- `<scan/list cmd>` — map the repo.
+- `<test cmd>` — confirm green before and after a change.
+- (Inspect first; never guess. Anything unverified is marked NEEDS VERIFICATION.)
+
+## Working rules here
+
+- Reference source-of-truth; never paste it. Stable refs only — no line numbers.
+- Mark unknowns `> [!WARNING] NEEDS VERIFICATION` rather than inventing.
+- Run the doc gate before claiming docs are done.
+
+## Update triggers
+
+- New top-level doc → add a row above.
+- Command/stack change → update `AGENTS.md`, not this index.
+
+---
+Source of truth: this is an index — each linked doc owns its own facts. Update when: a doc is added/renamed/removed.
