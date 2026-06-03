@@ -1,0 +1,14 @@
+<!--
+  CLAUDE.md — thin importer. Its ONLY substance is the @AGENTS.md import plus a
+  short Claude-Code-specific block. Put NO fact here that belongs in AGENTS.md
+  (that would duplicate and drift). Codex ignores this file; Claude Code reads it
+  and pulls in AGENTS.md via the import. Keep it tiny (≤ ~15 lines + the import).
+  Do NOT add heavy @-imports of reference files — @ force-loads context.
+-->
+@AGENTS.md
+
+## Claude Code specifics
+
+- Deep docs: architecture → `docs/architecture.md`; onboarding → `docs/onboarding.md`. <!-- adjust/remove to match what exists -->
+- Skills/commands: <list any repo-specific skills or `/commands`, or remove this line>.
+- Everything an agent needs on every task lives in AGENTS.md above.
