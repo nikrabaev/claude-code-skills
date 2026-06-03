@@ -31,8 +31,11 @@ _SQL_TABLE = re.compile(
     r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[\"`]?([A-Za-z_][\w.]*)[\"`]?\s*\(",
     re.IGNORECASE,
 )
+# Match `models.Model` anywhere in the base list, so mixins before OR after the
+# base are handled (e.g. `class B(models.Model, Mixin)` and
+# `class C(Mixin, models.Model)`), as well as dotted bases (`django.db.models.Model`).
 _DJANGO_MODEL = re.compile(
-    r"^\s*class\s+([A-Za-z_]\w*)\s*\(\s*[\w.]*models\.Model\s*\)",
+    r"^\s*class\s+([A-Za-z_]\w*)\s*\([^)]*\bmodels\.Model\b",
     re.MULTILINE,
 )
 

@@ -54,6 +54,22 @@ class TestDjango(Base):
             rows,
         )
 
+    def test_model_with_mixin_after_base(self):
+        # A mixin listed AFTER models.Model is common in real Django code.
+        write(self.root, "models.py", "class Invoice(models.Model, TimestampMixin):\n    pass\n")
+        rows = extract_schema.extract(self.root)
+        self.assertIn("Invoice", {r["entity"] for r in rows})
+
+    def test_model_with_mixin_before_base(self):
+        write(self.root, "models.py", "class Note(TimestampMixin, models.Model):\n    pass\n")
+        rows = extract_schema.extract(self.root)
+        self.assertIn("Note", {r["entity"] for r in rows})
+
+    def test_dotted_base_still_matches(self):
+        write(self.root, "models.py", "class User(django.db.models.Model):\n    pass\n")
+        rows = extract_schema.extract(self.root)
+        self.assertIn("User", {r["entity"] for r in rows})
+
 
 class TestMainAndEmpty(Base):
     def test_empty(self):

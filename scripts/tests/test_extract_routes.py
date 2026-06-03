@@ -68,6 +68,27 @@ class TestFlaskFastapi(Base):
         self.assertEqual(methods, ["GET", "POST"])
 
 
+class TestComments(Base):
+    def test_js_commented_route_ignored(self):
+        write(self.root, "src/api.ts",
+              "// router.get('/commented', h)\nrouter.get('/real', realH)\n")
+        rows = extract_routes.extract(self.root)
+        paths = [r["path"] for r in rows]
+        self.assertNotIn("/commented", paths)
+        self.assertIn("/real", paths)
+
+    def test_python_commented_decorator_ignored(self):
+        write(self.root, "app.py",
+              '# @app.get("/commented")\n@app.get("/real")\n'
+              "async def real_handler():\n    pass\n")
+        rows = extract_routes.extract(self.root)
+        paths = [r["path"] for r in rows]
+        self.assertNotIn("/commented", paths)
+        real = [r for r in rows if r["path"] == "/real"]
+        self.assertEqual(len(real), 1)
+        self.assertEqual(real[0]["handler"], "real_handler")
+
+
 class TestMainAndEmpty(Base):
     def test_empty_repo(self):
         self.assertEqual(extract_routes.extract(self.root), [])

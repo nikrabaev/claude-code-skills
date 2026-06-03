@@ -57,9 +57,16 @@ def _read(path):
 
 
 def _from_js_text(text, relpath):
-    """Return route rows for a single JS/TS source string."""
+    """Return route rows for a single JS/TS source string.
+
+    Whole-line ``//`` comments are dropped first so commented-out routes are not
+    extracted (block comments and trailing comments are not stripped).
+    """
+    code = "\n".join(
+        line for line in text.splitlines() if not line.lstrip().startswith("//")
+    )
     out = []
-    for match in _JS_ROUTE.finditer(text):
+    for match in _JS_ROUTE.finditer(code):
         out.append({
             "method": match.group(1).upper(),
             "path": match.group(2),
@@ -79,8 +86,8 @@ def _find_following_def(lines, start):
         if line.strip() == "":
             i += 1
             continue
-        # Stacked decorators do not count against the look-ahead budget.
-        if line.lstrip().startswith("@"):
+        # Stacked decorators and comment lines do not count against the budget.
+        if line.lstrip().startswith("@") or line.lstrip().startswith("#"):
             i += 1
             continue
         match = _PY_DEF.match(line)
@@ -103,6 +110,9 @@ def _from_python_text(text, relpath):
     lines = text.splitlines()
     out = []
     for idx, line in enumerate(lines):
+        # Skip whole-line comments so commented-out decorators aren't extracted.
+        if line.lstrip().startswith("#"):
+            continue
         verb_match = _PY_VERB_DECORATOR.search(line)
         if verb_match:
             handler = _find_following_def(lines, idx + 1)
