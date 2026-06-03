@@ -2,8 +2,9 @@
 
 For each doc type: purpose · audience · allowed · forbidden · length · update
 triggers · source-of-truth. Lengths are reasoned targets ([SYNTHESIS]) unless a
-vendor number is cited. MVP/v1 of this plugin generates the first two; the rest are
-the taxonomy the audit and (later, v2) generators work against.
+vendor number is cited. The plugin has generators for `AGENTS.md`/`CLAUDE.md` (the
+first two), architecture, onboarding, ADRs, and the AI operating manual; request-flow
+and domain-model are documented as part of the architecture overview.
 
 ## AGENTS.md (canonical — Codex + interop)
 
@@ -26,7 +27,7 @@ the taxonomy the audit and (later, v2) generators work against.
   **Forbidden:** any fact that duplicates `AGENTS.md`; large `@`-imports.
 - **Length:** tiny (≤ ~15 lines + the import). **Triggers:** new skill/command.
 
-## Architecture overview (`docs/architecture.md`) — v2
+## Architecture overview (`docs/architecture.md`)
 
 - **Purpose:** durable mental model — components, boundaries, data flow.
   **Allowed:** stable structure, public contracts, *one* small validated Mermaid.
@@ -34,25 +35,25 @@ the taxonomy the audit and (later, v2) generators work against.
   components. **Length:** ~1–3 pages. **Triggers:** new top-level component,
   boundary change. **Stable refs:** module paths + exported symbols.
 
-## Request-flow docs — v2
+## Request-flow docs
 
 Trace one representative request: ordered hops by route + handler symbol +
 queue/topic; one sequence diagram. **Forbidden:** every branch, line refs.
 **Stable refs:** `POST /api/orders` → `createOrder()` in `src/api/orders.ts` →
 `orders.created` topic.
 
-## Domain-model docs — v2
+## Domain-model docs
 
 Entities, relationships, invariants, table/collection names. **Forbidden:** full
 schemas (reference migrations), volatile columns. **Stable refs:** `orders` table;
 `Order` in `src/domain/order.ts`.
 
-## Onboarding doc — v2
+## Onboarding doc
 
 Setup commands, repo tour by directory, a "first change" walkthrough referencing
 real files. **Forbidden:** duplicating README quickstart, line refs.
 
-## Local-dev / Deployment / Troubleshooting — v2
+## Local-dev / Deployment / Troubleshooting
 
 - **Local-dev:** run/test/debug locally; commands + ports + env *key names*.
 - **Deployment:** pipeline stages, environments, where config lives (reference, not
@@ -60,7 +61,7 @@ real files. **Forbidden:** duplicating README quickstart, line refs.
 - **Troubleshooting:** symptom → cause → fix table, each tied to a command.
 - **Forbidden everywhere:** secrets, line refs, copied config.
 
-## ADRs (`/adr/NNNN-imperative-name.md`) — v2
+## ADRs (`/adr/NNNN-imperative-name.md`)
 
 Capture *why* a significant decision was made. Nygard (Context/Decision/
 Consequences) or MADR (+ options & pros/cons). One decision per file.
@@ -71,7 +72,7 @@ Consequences) or MADR (+ options & pros/cons). One decision per file.
 ≤ ~15–20 nodes, quoted labels, validated with `maid`, no `click`/interactive links.
 See `mermaid-rules.md`.
 
-## AI operating manual (`docs/ai/OPERATING-MANUAL.md`, optional) — v2
+## AI operating manual (`docs/ai/OPERATING-MANUAL.md`, optional)
 
 The repo-specific "how an agent should work *here*": a doc index (one-line purpose +
 when-to-read per doc), the safe-inspection command set, the "do not document / do

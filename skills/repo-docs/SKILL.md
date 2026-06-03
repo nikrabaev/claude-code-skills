@@ -24,7 +24,12 @@ by name with a `REQUIRED SUB-SKILL:` marker.
 | "docs too long / over the cap / compress" | REQUIRED SUB-SKILL: repo-docs:compress-docs |
 | "fix references / no line numbers / how should we reference X?" | REQUIRED SUB-SKILL: repo-docs:stable-refs |
 | "what owns this fact? / remove duplication" | REQUIRED SUB-SKILL: repo-docs:source-of-truth-map |
-| architecture/onboarding/ADR docs, Mermaid diagrams, drift review | Not yet built (v2). Say so; do not improvise — offer the closest available skill. |
+| "architecture overview / system design / a diagram of the system" | REQUIRED SUB-SKILL: repo-docs:generate-architecture-doc |
+| "onboarding / dev setup / getting-started docs" | REQUIRED SUB-SKILL: repo-docs:generate-onboarding-doc |
+| "record a decision / write an ADR" | REQUIRED SUB-SKILL: repo-docs:generate-adr |
+| "make / fix / validate a Mermaid diagram" | REQUIRED SUB-SKILL: repo-docs:mermaid-diagrams |
+| "AI operating manual / how should an agent work here" | REQUIRED SUB-SKILL: repo-docs:generate-operating-manual |
+| "are our docs stale / drifting / out of date?" | REQUIRED SUB-SKILL: repo-docs:docs-drift-review |
 
 If the request spans several (e.g. "set up and validate"), route to the primary
 generator first; it runs the validation gate itself at the end.
