@@ -30,6 +30,8 @@ by name with a `REQUIRED SUB-SKILL:` marker.
 | "make / fix / validate a Mermaid diagram" | REQUIRED SUB-SKILL: repo-docs:mermaid-diagrams |
 | "AI operating manual / how should an agent work here" | REQUIRED SUB-SKILL: repo-docs:generate-operating-manual |
 | "are our docs stale / drifting / out of date?" | REQUIRED SUB-SKILL: repo-docs:docs-drift-review |
+| "score / quality-check / grade a doc" | REQUIRED SUB-SKILL: repo-docs:docs-quality-review |
+| "these docs are bad — fix / refactor them" | REQUIRED SUB-SKILL: repo-docs:refactor-bad-docs |
 
 If the request spans several (e.g. "set up and validate"), route to the primary
 generator first; it runs the validation gate itself at the end.
