@@ -1,0 +1,15 @@
+{
+  // Relaxed markdownlint config for AI-facing docs (AGENTS.md / CLAUDE.md and the
+  // generated doc set). Generated agent docs are dense and not prose-wrapped, so a
+  // few stylistic rules are noise here. Everything STRUCTURAL stays on (heading
+  // spacing, fenced-code languages, list/anchor/link defects), because those affect
+  // how the doc renders and how reliably an agent parses it.
+  //
+  // validate_markdown.sh applies this by default unless the target repo ships its
+  // own .markdownlint* / .markdownlint-cli2* config (then that wins).
+  "default": true,
+  "MD013": false,
+  "MD033": false,
+  "MD041": false,
+  "MD024": { "siblings_only": true }
+}

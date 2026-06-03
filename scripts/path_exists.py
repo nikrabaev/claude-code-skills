@@ -27,6 +27,28 @@ _ENV_VAR_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 # Bare filename with an extension, e.g. config.json, README.md.
 _FILENAME_EXT_RE = re.compile(r"^[\w.-]+\.[A-Za-z0-9]+$")
 
+# Real file extensions for slash-LESS tokens. A token like `Bun.argv`,
+# `process.env`, `React.FC`, `array.map`, or `obj.method` looks like
+# "filename.ext" but is a dotted identifier, NOT a file path. So a token with no
+# "/" is only treated as a path when its extension is in this allowlist. (Tokens
+# WITH a "/" are always treated as paths regardless of extension.) Extensions that
+# collide with common identifiers -- env, argv, map -- are deliberately EXCLUDED;
+# real dotenv/source-map files are referenced as `.env` / `*.js.map` which either
+# don't match the filename regex or are rare enough that lychee can cover them.
+_FILE_EXT_ALLOWLIST = frozenset([
+    "ts", "tsx", "js", "jsx", "mjs", "cjs", "py", "pyi", "go", "rs", "rb", "java",
+    "kt", "kts", "c", "cc", "cpp", "cxx", "h", "hh", "hpp", "mm", "cs", "php",
+    "swift", "scala", "clj", "ex", "exs", "erl", "hs", "lua", "pl", "dart",
+    "sql", "sh", "bash", "zsh", "fish", "ps1", "bat",
+    "md", "mdx", "rst", "txt", "adoc",
+    "json", "jsonc", "json5", "yaml", "yml", "toml", "ini", "cfg", "conf",
+    "properties", "lock", "mod", "sum", "gradle",
+    "css", "scss", "sass", "less", "styl", "html", "htm", "xml", "svg",
+    "vue", "svelte", "astro", "proto", "graphql", "gql", "prisma", "tf",
+    "mk", "cmake", "podspec", "gemspec", "rake",
+    "csv", "tsv", "png", "jpg", "jpeg", "gif", "webp", "ico", "pdf",
+])
+
 _TRAILING_PUNCT = ".,;:"
 
 
@@ -82,8 +104,12 @@ def _looks_like_path(token):
         return None
     if _has_glob(token):
         return None
-    if "/" in token or _FILENAME_EXT_RE.match(token):
+    if "/" in token:
         return token
+    if _FILENAME_EXT_RE.match(token):
+        ext = token.rsplit(".", 1)[1].lower()
+        if ext in _FILE_EXT_ALLOWLIST:
+            return token
     return None
 
 

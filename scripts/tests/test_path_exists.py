@@ -49,6 +49,24 @@ class TestCheckDoc(BaseTmp):
         text = "Email `mailto:a@b.com` ok.\n"
         self.assertEqual(path_exists.check_doc(text, self.root), [])
 
+    # dotted identifiers (Bun.argv, process.env, React.FC) are NOT file paths:
+    # a slash-less token is only a path when its extension is a real file extension.
+    def test_dotted_identifier_skipped(self):
+        text = "Parses `Bun.argv` and reads `process.env` then `React.FC`.\n"
+        self.assertEqual(path_exists.check_doc(text, self.root), [])
+
+    # a bare filename with a REAL extension is still checked (flagged if missing)
+    def test_bare_known_extension_still_checked(self):
+        text = "See `config.yaml` for setup.\n"
+        violations = path_exists.check_doc(text, self.root)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["token"], "config.yaml")
+
+    def test_bare_known_extension_exists_ok(self):
+        write(os.path.join(self.root, "config.yaml"), "k: v\n")
+        text = "See `config.yaml` for setup.\n"
+        self.assertEqual(path_exists.check_doc(text, self.root), [])
+
     # d) symbol/call -> skipped
     def test_d_symbol_call_skipped(self):
         text = "Call `processPayment()` to charge.\n"
