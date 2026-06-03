@@ -152,5 +152,33 @@ class TestMain(Base):
         self.assertEqual(score_docs.main(["--root", self.root, "--weights", "nope=0.5", "good.md"]), 2)
 
 
+class TestHtmlComments(Base):
+    def test_comment_tiers_do_not_count_as_boundaries(self):
+        text = "# x\n\n<!-- boundaries missing: ✅ ⚠️ \U0001f6ab -->\n\nSome prose with no real boundaries here.\n"
+        self.assertEqual(score_docs.score_doc(text)["dimensions"]["boundaries"]["score"], 0.0)
+
+    def test_comment_examples_do_not_count(self):
+        text = "# x\n\n<!-- example ✅ good \U0001f6ab bad e.g. foo -->\n\nPlain prose line with several words here.\n"
+        self.assertEqual(score_docs.score_doc(text)["dimensions"]["examples"]["score"], 0.0)
+
+    def test_comment_lines_excluded_from_evidence(self):
+        # a long HTML comment must not count as a content line for evidence; only
+        # the real backticked claim should, and it bears evidence -> 1.0
+        text = (
+            "# x\n\n"
+            "<!-- this is a long explanatory comment with many words but no code -->\n\n"
+            "Real claim: `src/a.ts` is the entry point of the app.\n"
+        )
+        self.assertEqual(score_docs.score_doc(text)["dimensions"]["evidence"]["score"], 1.0)
+
+    def test_multiline_comment_stripped(self):
+        text = (
+            "# x\n\n"
+            "<!--\n  ✅ Always do this\n  ⚠️ Ask first\n  🚫 Never that\n-->\n\n"
+            "Just one plain sentence with several words present.\n"
+        )
+        self.assertEqual(score_docs.score_doc(text)["dimensions"]["boundaries"]["score"], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

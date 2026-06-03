@@ -57,6 +57,20 @@ _DIMENSIONS = (
     "drift",
 )
 
+# HTML comments. They are invisible to any reader/agent (and the generators
+# delete the template comment before shipping), so their contents must NOT count
+# toward the "rendered" dimensions (evidence, examples, boundaries). Otherwise an
+# annotation like "<!-- boundaries missing: ✅ ⚠️ 🚫 -->" would falsely earn full
+# boundary credit. (size_fit measures raw bytes -- Codex loads the whole file;
+# ref_stability and drift mirror the gate's exact checks -- so those use raw text.)
+_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+
+
+def _strip_html_comments(text):
+    """Remove ``<!-- ... -->`` spans (including multi-line) from ``text``."""
+    return _HTML_COMMENT_RE.sub("", text)
+
+
 # Fenced code blocks (mirror dup_detect's fence shape).
 _FENCE_RE = re.compile(r"^```[^\n]*\n(.*?)^```", re.DOTALL | re.MULTILINE)
 
@@ -208,12 +222,17 @@ def score_doc(
 
     drift_applicable = root is not None
 
+    # "Rendered" dimensions ignore HTML comments (invisible to readers/agents).
+    # size_fit (raw bytes -> Codex cap), ref_stability and drift (mirror the gate)
+    # operate on the raw text.
+    visible = _strip_html_comments(text)
+
     scores = {
         "size_fit": _score_size_fit(text, size_target, size_cap),
-        "evidence": _score_evidence(text),
+        "evidence": _score_evidence(visible),
         "ref_stability": _score_ref_stability(text),
-        "examples": _score_examples(text),
-        "boundaries": _score_boundaries(text),
+        "examples": _score_examples(visible),
+        "boundaries": _score_boundaries(visible),
     }
     if drift_applicable:
         scores["drift"] = _score_drift(root, doc_path, index)
@@ -224,16 +243,16 @@ def score_doc(
         "size_fit": "%d bytes (target %d, cap %d)" % (
             len(text.encode("utf-8")), size_target, size_cap),
         "evidence": "%d/%d content lines bear evidence" % (
-            sum(1 for ln in _content_lines(text) if _has_evidence(ln)),
-            len(_content_lines(text)),
+            sum(1 for ln in _content_lines(visible) if _has_evidence(ln)),
+            len(_content_lines(visible)),
         ),
         "ref_stability": "%d line-number reference(s)" % len(
             no_line_refs.find_violations(text)),
         "examples": "%d example signal(s)" % (
-            text.count("✅") + text.count("🚫")
-            + len(_fenced_blocks(text)) + len(_EG_RE.findall(text))
+            visible.count("✅") + visible.count("🚫")
+            + len(_fenced_blocks(visible)) + len(_EG_RE.findall(visible))
         ),
-        "boundaries": _boundaries_detail(text),
+        "boundaries": _boundaries_detail(visible),
         "drift": (
             "%d drift finding(s)" % len(
                 drift_check.find_drift(root, [doc_path], index))
