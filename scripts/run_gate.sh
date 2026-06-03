@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # run_gate.sh — the documentation validation gate (DESIGN.md §12), composed.
 #
+# Point this at a TARGET repo's generated AI docs (AGENTS.md/CLAUDE.md/docs). It
+# validates existence claims (paths, symbols, links) against that repo's real
+# source, so running it against this plugin's own teaching docs (references/,
+# examples/, checklists/) WILL report false "dead path" findings — those cite
+# illustrative paths on purpose. The gate is for generated docs, not meta-docs.
+#
 # Runs every check in order. Each step is classified by its exit code:
 #   0      -> PASS
 #   2      -> SKIP (the external tool or symbol index is unavailable; reported,
@@ -20,6 +26,11 @@
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Per-run scratch file for step output (avoid a fixed /tmp path that could collide
+# across concurrent runs or be pre-created as a hostile symlink).
+GATE_OUT="$(mktemp "${TMPDIR:-/tmp}/repo-docs-gate.XXXXXX")"
+trap 'rm -f "$GATE_OUT"' EXIT
 
 ROOT="."
 CWD=""
@@ -41,17 +52,17 @@ passes=0
 run_step() {
   local label="$1"; shift
   local rc=0
-  "$@" >/tmp/.gate_out 2>&1 || rc=$?
+  "$@" >"$GATE_OUT" 2>&1 || rc=$?
   if [ "$rc" -eq 0 ]; then
     printf '  \033[32mPASS\033[0m  %s\n' "$label"
     passes=$((passes + 1))
   elif [ "$rc" -eq 2 ]; then
     printf '  \033[33mSKIP\033[0m  %s\n' "$label"
-    sed 's/^/        /' /tmp/.gate_out
+    sed 's/^/        /' "$GATE_OUT"
     skips=$((skips + 1))
   else
     printf '  \033[31mFAIL\033[0m  %s\n' "$label"
-    sed 's/^/        /' /tmp/.gate_out
+    sed 's/^/        /' "$GATE_OUT"
     errors=$((errors + 1))
   fi
 }

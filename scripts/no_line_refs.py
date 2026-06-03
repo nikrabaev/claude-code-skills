@@ -31,6 +31,8 @@ _EXTENSIONS = [
     "kt", "c", "cc", "cpp", "cxx", "h", "hpp", "cs", "php", "swift", "scala",
     "sql", "sh", "bash", "zsh", "md", "txt", "json", "yaml", "yml", "toml",
     "ini", "cfg", "css", "scss", "html", "xml", "vue", "svelte",
+    "lua", "dart", "ex", "exs", "erl", "clj", "cljs", "zig", "ml", "mli",
+    "jl", "hs", "pl", "mdx", "rst",
 ]
 
 # Pattern 1: a ``name.ext`` token immediately followed by ``:`` and digits,
@@ -44,6 +46,11 @@ _FILE_REF = re.compile(
 
 # Pattern 2: the phrase ``line NNN`` (case-insensitive).
 _LINE_PHRASE = re.compile(r"\bline\s+\d+\b", re.IGNORECASE)
+
+# A URL span. Used to suppress Pattern-1 matches that live INSIDE a URL whose
+# path happens to end in ``name.ext:NN`` (e.g. a deep link into a file viewer) --
+# those are links, not stale code references.
+_URL = re.compile(r"https?://\S+")
 
 # Directory names to skip during recursive discovery.
 _SKIP_DIRS = frozenset(
@@ -59,7 +66,14 @@ _FENCE = re.compile(r"^\s*(`{3,}|~{3,})")
 def _line_violations(line):
     """Return a list of {"match": str} for a single (non-fenced) line."""
     found = []
+    url_spans = [(m.start(), m.end()) for m in _URL.finditer(line)]
+
+    def in_url(start, end):
+        return any(start < ue and us < end for (us, ue) in url_spans)
+
     for m in _FILE_REF.finditer(line):
+        if in_url(m.start(), m.end()):
+            continue
         found.append({"match": m.group(0)})
     for m in _LINE_PHRASE.finditer(line):
         found.append({"match": m.group(0)})

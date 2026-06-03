@@ -64,6 +64,10 @@ for line in sys.stdin:
     symbol, kind, path = parts[0], parts[1], parts[2]
     if not symbol:
         continue
+    # rg prints paths as "./src/a.ts"; the contract is a relpath-from-root with
+    # no "./" prefix (matching the ctags path). Normalize.
+    if path.startswith("./"):
+        path = path[2:]
     out.append({"symbol": symbol, "kind": kind, "file": path})
 
 json.dump(out, sys.stdout, separators=(",", ":"))

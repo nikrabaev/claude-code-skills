@@ -40,6 +40,21 @@ class FindViolationsTest(unittest.TestCase):
         )
         self.assertEqual(result, [])
 
+    # d2) a URL whose path itself ends in name.ext:NN must NOT be flagged [I1]
+    def test_url_embedding_line_ref_not_flagged(self):
+        result = no_line_refs.find_violations(
+            "Source at https://example.com:8080/src/file.ts:42 online"
+        )
+        self.assertEqual(result, [])
+
+    # d3) a real line ref next to a URL is still flagged (no over-suppression)
+    def test_real_line_ref_beside_url_still_flagged(self):
+        result = no_line_refs.find_violations(
+            "Visit https://example.com/x but fix src/app.ts:412 first"
+        )
+        self.assertEqual(len(result), 1)
+        self.assertIn("src/app.ts:412", result[0]["match"])
+
     # e) fenced code block content ignored (backtick fence)
     def test_fenced_backtick_block_ignored(self):
         text = "Intro\n```\nsrc/x.ts:9\n```\nOutro\n"
