@@ -11,7 +11,7 @@
       "name": "repo-docs",
       "source": "./plugins/repo-docs",
       "description": "Generate, audit, compress, and validate AI-facing repository documentation (canonical CLAUDE.md) for Claude Code, with stable references, source-of-truth discipline, and a validation gate with a soft verbosity budget.",
-      "version": "0.1.0",
+      "version": "0.2",
       "author": {
         "name": "Nikita Rabaev",
         "email": "nikrabaev@gmail.com"
