@@ -15,6 +15,8 @@ do not claim "done" until the automated gate output is shown and clean.
 - [ ] Non-obvious code-style rules carry ✅/🚫 examples. [BP-13]
 - [ ] Source-of-truth pointer + update triggers present (footer). [BP-10]
 - [ ] No volatile/temporary detail in an always-loaded file. [BP-11]
+- [ ] Describes the current state only — no historical narration ("used to", "now …
+      instead of"); history lives in migration guides / changelogs / ADRs. [BP-14]
 - [ ] Mermaid (if any) validated, ≤ ~15–20 nodes, no `click`/interactive links. [BP-12 / AP-15]
 - [ ] No heavy `@`-imports of large reference files in always-loaded files. [AP-11]
 - [ ] Human-facing content not mixed into agent files (README ≠ CLAUDE.md). [BP-4]

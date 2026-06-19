@@ -35,6 +35,12 @@ We are currently mid-migration to the v2 API; for now use the old client.
 <!-- [AP-9] volatile/temporary detail in an always-loaded file. Fix: omit from
      durable docs, or keep as a dated note outside CLAUDE.md. -->
 
+The API used to authenticate with session cookies, but now it uses JWT bearer tokens.
+<!-- [AP-16] historical narration: describing the old behavior next to the new one
+     bloats the file and can trap the agent into following the obsolete description.
+     Fix: state only the current behavior ("auth uses JWT bearer tokens"); put the
+     history in a changelog / migration guide. -->
+
 <!-- [AP-2/AP-14] MISSING: no Boundaries section (✅/⚠️/🚫). The single
      highest-signal section is absent — "Never commit secrets" especially.
      Also MISSING: a source-of-truth pointer + update triggers footer. -->

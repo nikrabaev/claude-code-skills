@@ -34,8 +34,9 @@ source-of-truth. Note both before touching anything.
 3. **Route low-frequency depth out** — any section needed on < ~50% of tasks (API
    tables, schema, troubleshooting matrices, long architecture prose) moves to a
    `docs/<topic>.md`; leave a one-line pointer with a *when-to-read* hint.
-4. **Strip volatile detail** — "mid-migration", "for now", dated TODOs don't belong
-   in an always-loaded file.
+4. **Strip volatile detail and historical narration** — "mid-migration", "for now",
+   dated TODOs, and before/after history ("used to … now …") don't belong in an
+   always-loaded file; history lives in changelogs / migration guides.
 5. **Keep:** commands, hard guardrails/Boundaries, "where things live", the
    source-of-truth pointer and update triggers.
 
