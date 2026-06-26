@@ -41,6 +41,13 @@ The API used to authenticate with session cookies, but now it uses JWT bearer to
      Fix: state only the current behavior ("auth uses JWT bearer tokens"); put the
      history in a changelog / migration guide. -->
 
+`createUser` passes `role` directly because the column has no default.
+<!-- [AP-16] edit-time variant (deviation-marker): this note once explained why
+     `role` was *omitted* (the DB defaulted it). When `role` became an explicit
+     input, it was *revised* to track the change instead of deleted — so it now
+     just restates the code as a false "something special here" signal. Fix: delete
+     the marker; don't revise a comment to stay in sync with an edit. -->
+
 <!-- [AP-2/AP-14] MISSING: no Boundaries section (✅/⚠️/🚫). The single
      highest-signal section is absent — "Never commit secrets" especially.
      Also MISSING: a source-of-truth pointer + update triggers footer. -->
