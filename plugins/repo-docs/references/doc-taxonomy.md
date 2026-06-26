@@ -92,3 +92,12 @@ relegate history to the channels built for it.
 - **Distinct from AP-9 / BP-11** (volatile/temporary detail like "mid-migration"):
   AP-9 is something *currently in flux*; AP-16 is a *settled past* narrated next to
   the present. Both are kept out of durable docs.
+- **Edit-time corollary (deviation-markers).** History also creeps in by *revising*
+  a comment/note instead of deleting it. A marker that exists to flag a *deviation
+  from the pattern* — a deliberate omission, special-case, `HACK`, "unlike the
+  others…" — derives all its value from contrast with the norm. When an edit
+  **eliminates** that deviation (brings the outlier back in line), **delete** the
+  marker; don't revise it to track the change. A revised marker narrates the edit's
+  history and becomes a false "something special here" signal on now-ordinary code —
+  e.g. a `// role isn't passed — DB defaults it` comment rewritten to `// pass role
+  directly, no default` after `role` became an explicit input, instead of removed.
