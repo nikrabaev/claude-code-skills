@@ -44,6 +44,7 @@ For every doc, check and cite concrete evidence:
 | References source-of-truth, no copies | AP-6 duplication |
 | Claims trace to real paths/symbols | AP-4 hallucinated architecture |
 | No volatile/temporary detail in always-loaded files | AP-9 |
+| Describes current state, no historical narration ("used to … now …") | AP-16 |
 | Human vs AI docs separated (README ≠ CLAUDE.md) | AP-13 |
 | No heavy `@`-imports of large reference files | AP-11 force-load bloat |
 | Mermaid validated, ≤ node cap, no `click` | AP-3 / AP-15 |

@@ -12,8 +12,9 @@ architecture overview.
   **Audience:** Claude Code (always-loaded project memory).
 - **Allowed:** the six high-signal sections — commands+flags, testing, structure,
   code-style *examples*, git workflow, **✅/⚠️/🚫 boundaries** — plus pointers to
-  deep docs. **Forbidden:** architecture essays, volatile state, duplicated
-  `package.json`/config, line numbers, large `@`-imports.
+  deep docs. **Forbidden:** architecture essays, volatile state, historical
+  narration ("used to … now …"), duplicated `package.json`/config, line numbers,
+  large `@`-imports.
 - **Length:** ≤ ~1–2 pages; the whole root→cwd chain within the verbosity budget
   (soft ~32 KiB). **Triggers:** command/stack/version change, new guardrail,
   structural move, new skill/command.
@@ -24,8 +25,8 @@ architecture overview.
 
 - **Purpose:** durable mental model — components, boundaries, data flow.
   **Allowed:** stable structure, public contracts, *one* small validated Mermaid.
-  **Forbidden:** implementation minutiae, line refs, volatile detail, invented
-  components. **Length:** ~1–3 pages. **Triggers:** new top-level component,
+  **Forbidden:** implementation minutiae, line refs, volatile detail, historical
+  narration, invented components. **Length:** ~1–3 pages. **Triggers:** new top-level component,
   boundary change. **Stable refs:** module paths + exported symbols.
 
 ## Request-flow docs
@@ -76,3 +77,18 @@ indexes — it is an *index* of pointers.
 
 README is for **humans** (quickstart); `CLAUDE.md` is the **agent's** operating
 context. Don't mix audiences — it bloats both (anti-pattern AP-13).
+
+## Current-state principle (temporal scope)
+
+Durable docs describe the system **as it is now** — not how it got here. Narrating
+history ("the auth flow used to use sessions; now it uses JWT"; "before v2 …, now …")
+is anti-pattern **AP-16**: it bloats always-loaded files and can trap an agent into
+following the obsolete description. **BP-14:** document the current state only;
+relegate history to the channels built for it.
+
+- **Allowed homes for history:** migration/upgrade guides, changelogs, ADRs (the
+  *why* of a past decision), and — rarely — examples that intentionally show a prior
+  refactoring.
+- **Distinct from AP-9 / BP-11** (volatile/temporary detail like "mid-migration"):
+  AP-9 is something *currently in flux*; AP-16 is a *settled past* narrated next to
+  the present. Both are kept out of durable docs.

@@ -47,6 +47,9 @@ Honor every rule:
 - **Footer**: `Source of truth: <dirs>. Update when: <triggers>.`
 - **No volatile detail** ("mid-migration", "for now", dated TODOs) in this
   always-loaded file.
+- **No historical narration** — describe the current state, not how it changed
+  ("the API used to … now …"). History belongs in migration guides / changelogs /
+  ADRs.
 - Keep it to ~1–2 pages — within the verbosity budget. Markdown must be lint-clean
   (blank lines around headings; every fenced block has a language).
 - **Deep docs as pointers** — link `docs/architecture.md`, `docs/onboarding.md`,

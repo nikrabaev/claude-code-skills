@@ -35,6 +35,8 @@ locates the thing.
 - The agent discovers it trivially (`npm` / `git` / `pytest` output) → don't waste
   budget.
 - It's temporary state ("mid-migration") → omit from durable docs.
+- It's historical ("the old auth flow", "before the refactor") → omit; document only
+  the current contract. History belongs in a changelog / migration guide.
 - It would duplicate a linter/formatter rule → point to the config.
 
 ## How the plugin enforces this

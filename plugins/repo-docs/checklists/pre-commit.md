@@ -21,5 +21,7 @@ Before committing generated or edited docs, create a TodoWrite item for each box
 
 - [ ] Unknowns marked `> [!WARNING] NEEDS VERIFICATION`, not invented. [BP-9]
 - [ ] No volatile/temporary detail in an always-loaded file. [BP-11]
+- [ ] Describes the current state — no historical narration ("used to … now …");
+      history belongs in migration guides / changelogs / ADRs. [BP-14]
 - [ ] (ADRs only) No edit to an accepted ADR's body — superseded instead. [§8]
 - [ ] (Optional, advisory) Ran `drift_check.py` and triaged any stale findings.
