@@ -57,7 +57,8 @@ Honor every rule:
 
 For a monorepo, put repo-wide rules in the root `CLAUDE.md` and package-specific
 overrides in nested `packages/<x>/CLAUDE.md` (Claude Code merges the nearest).
-Keep the whole chain within the verbosity budget.
+Keep the whole chain within the verbosity budget — including anything CLAUDE.md
+`@`-imports (`@AGENTS.md`, `@docs/...`); `size_check` follows those imports.
 
 ### 3. Run the gate — no "done" until it passes
 

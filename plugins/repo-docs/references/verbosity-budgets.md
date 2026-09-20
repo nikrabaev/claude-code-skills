@@ -7,9 +7,11 @@ context cheap.
 ## Soft budget for the always-loaded file
 
 - **CLAUDE.md: stay well under ~32 KiB** for the root→cwd chain Claude Code loads
-  on every task. `size_check.py` sums the chain and warns as it approaches the
-  budget. This is a soft target, not a hard cap — an oversized always-loaded file
-  spends context budget and invites context rot, so trim rather than fill it.
+  on every task, **plus every file it `@`-imports** (recursively — an `@AGENTS.md`
+  line makes AGENTS.md always-loaded too). `size_check.py` sums the chain with its
+  imports and warns as it approaches the budget. This is a soft target, not a hard
+  cap — an oversized always-loaded file spends context budget and invites context
+  rot, so trim rather than fill it.
 
 ## Authoring targets (Superpowers) — strong targets, not gates
 

@@ -8,7 +8,7 @@ do not claim "done" until the automated gate output is shown and clean.
 - [ ] Every claim traces to a file / symbol / command actually inspected — no guessing. [BP-9]
 - [ ] No line-number references anywhere. [AP-1]
 - [ ] No duplicated source-of-truth (no pasted `package.json`/config/schema). [BP-2]
-- [ ] CLAUDE.md (whole root→cwd chain) within its verbosity budget; each file within its tier budget. [BP-8]
+- [ ] CLAUDE.md (whole root→cwd chain, including `@`-imported files) within its verbosity budget; each file within its tier budget. [BP-8]
 - [ ] Boundaries section present with all three tiers (✅ Always / ⚠️ Ask first / 🚫 Never). [BP-5]
 - [ ] Commands lead, with flags (including a single-test command). [BP-6]
 - [ ] Stack named with versions, not vaguely described. [BP-7]
