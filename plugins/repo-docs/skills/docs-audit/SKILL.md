@@ -19,7 +19,9 @@ edits — generation/repair is a different skill.
 ### 1. Locate the docs
 
 Find `CLAUDE.md` (root and nested) and anything under `docs/` or `/adr`. Note the
-CLAUDE.md chain (root→cwd files).
+CLAUDE.md chain (root→cwd files) **and every file it `@`-imports** (e.g.
+`@AGENTS.md`) — those are force-loaded on every task, so read and score them as
+part of the always-loaded layer, not as on-demand docs. `size_check` lists them.
 
 ### 2. Run the automated checks (read-only)
 

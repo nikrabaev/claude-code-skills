@@ -124,6 +124,46 @@ class SizeCheckTestCase(unittest.TestCase):
         self.assertEqual(size_check.main(["--root", self.root, "--budget", "50"]), 1)
         self.assertEqual(size_check.main(["--root", self.root, "--budget", "200"]), 0)
 
+    # imports: @AGENTS.md in CLAUDE.md is force-loaded, so it counts toward the chain
+    def test_k_import_counted(self):
+        write_file(os.path.join(self.root, "CLAUDE.md"), "@AGENTS.md\n")
+        write_file(os.path.join(self.root, "AGENTS.md"), "x" * 40000)
+        result = size_check.check(self.root)
+        self.assertEqual(len(result["chain_files"]), 2)
+        self.assertTrue(result["over_budget"])
+        self.assertEqual(result["files"][1]["imported_by"], os.path.join(self.root, "CLAUDE.md"))
+        self.assertEqual(size_check.main(["--root", self.root]), 1)
+        buf = StringIO()
+        with redirect_stdout(buf):
+            size_check.main(["--root", self.root])
+        self.assertIn("@-imported by", buf.getvalue())
+
+    # imports: relative to the importing file, ~/ expanded, recursive, deduplicated, depth-capped
+    def test_l_import_resolution(self):
+        write_file(os.path.join(self.root, "CLAUDE.md"), "See @docs/a.md and @docs/a.md again.\n")
+        write_file(os.path.join(self.root, "docs", "a.md"), "@b.md\n" + "a" * 10)
+        write_file(os.path.join(self.root, "docs", "b.md"), "@../CLAUDE.md\n" + "b" * 10)  # cycle
+        result = size_check.check(self.root)
+        paths = [os.path.relpath(p, self.root) for p in result["chain_files"]]
+        self.assertEqual(paths, ["CLAUDE.md", os.path.join("docs", "a.md"), os.path.join("docs", "b.md")])
+        # depth cap: a chain of 7 hops stops after MAX_IMPORT_DEPTH
+        write_file(os.path.join(self.root, "CLAUDE.md"), "@d1.md\n")
+        for i in range(1, 8):
+            write_file(os.path.join(self.root, "d%d.md" % i), "@d%d.md\n" % (i + 1))
+        result = size_check.check(self.root)
+        self.assertEqual(len(result["chain_files"]), 1 + size_check.MAX_IMPORT_DEPTH)
+
+    # imports: ignored inside code spans / fenced blocks; missing targets and emails skipped
+    def test_m_import_ignored_in_code_and_missing(self):
+        write_file(os.path.join(self.root, "CLAUDE.md"),
+                   "`@a.md`\n```\n@b.md\n```\nmail me@c.md\n@missing.md\n@d.md,\n")
+        for name in ("a.md", "b.md", "c.md", "d.md"):
+            write_file(os.path.join(self.root, name), "x" * 10)
+        result = size_check.check(self.root)
+        paths = [os.path.basename(p) for p in result["chain_files"]]
+        self.assertEqual(paths, ["CLAUDE.md", "d.md"])
+        self.assertEqual(size_check.find_imports("@x.md\n@~/y.md @/abs/z.md"), ["x.md", "~/y.md", "/abs/z.md"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

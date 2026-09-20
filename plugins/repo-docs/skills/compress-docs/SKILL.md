@@ -25,6 +25,12 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dup_detect.py --root .
 `size_check` gives the chain bytes vs the verbosity budget; `dup_detect` finds pasted
 source-of-truth. Note both before touching anything.
 
+The chain includes every file CLAUDE.md force-loads via `@path` imports (e.g.
+`@AGENTS.md`, `@docs/x.md`), recursively — `size_check` lists them as
+`@-imported by`. Those files ARE the always-loaded layer: compress them with the
+same rules below, and never "fix" an over-budget CLAUDE.md by moving text behind an
+`@` import.
+
 ### 2. Reduce, in this order
 
 1. **Delete duplicated source-of-truth** — replace pasted `package.json` scripts /
@@ -34,10 +40,14 @@ source-of-truth. Note both before touching anything.
 3. **Route low-frequency depth out** — any section needed on < ~50% of tasks (API
    tables, schema, troubleshooting matrices, long architecture prose) moves to a
    `docs/<topic>.md`; leave a one-line pointer with a *when-to-read* hint.
-4. **Strip volatile detail and historical narration** — "mid-migration", "for now",
+4. **Demote heavy `@`-imports** — an `@docs/huge.md` line force-loads the whole
+   file on every task (AP-11). Keep `@` only for a small canonical file (e.g.
+   `@AGENTS.md`); turn every other import into a plain-path pointer with a
+   *when-to-read* hint.
+5. **Strip volatile detail and historical narration** — "mid-migration", "for now",
    dated TODOs, and before/after history ("used to … now …") don't belong in an
    always-loaded file; history lives in changelogs / migration guides.
-5. **Keep:** commands, hard guardrails/Boundaries, "where things live", the
+6. **Keep:** commands, hard guardrails/Boundaries, "where things live", the
    source-of-truth pointer and update triggers.
 
 Preserve stable references and the ✅/⚠️/🚫 Boundaries while trimming.
